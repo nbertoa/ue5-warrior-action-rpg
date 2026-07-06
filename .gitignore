@@ -1,0 +1,61 @@
+# ============================================================
+# Unreal Engine — WarriorRPG .gitignore
+# Tracks: Source/, Config/, Plugins/, *.uproject
+# Excludes: all binary/derived/asset content
+# ============================================================
+
+# ----- Unreal build artifacts -----
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# ----- Unreal content (assets tracked via Google Drive backup) -----
+Content/
+
+# ----- Visual Studio -----
+.vs/
+*.sln
+*.suo
+*.user
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.opendb
+
+# ----- JetBrains Rider -----
+.idea/
+*.DotSettings.user
+
+# ----- VS Code -----
+.vscode/
+
+# ----- macOS -----
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ----- Windows -----
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ----- Compiled object files -----
+*.obj
+*.o
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+
+# ----- Unreal crash logs -----
+*.dmp
+*.log

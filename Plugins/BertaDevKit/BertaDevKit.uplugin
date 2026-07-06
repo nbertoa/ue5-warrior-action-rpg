@@ -1,0 +1,28 @@
+﻿{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0",
+  "FriendlyName": "BertaDevKit",
+  "Description": "Personal UE5 C++ utility plugin. Reusable debug, math, and actor helpers across projects.",
+  "Category": "Other",
+  "CreatedBy": "Nicolas Bertoa",
+  "CreatedByURL": "https://github.com/nbertoa",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "CanContainContent": true,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "BertaDevKit",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "BertaDevKitEditor",
+      "Type": "Editor",
+      "LoadingPhase": "PreDefault"
+    }
+  ]
+}
