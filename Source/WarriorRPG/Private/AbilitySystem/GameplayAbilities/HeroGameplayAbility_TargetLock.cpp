@@ -13,7 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "UI/WarriorActivatableWidget.h"
+#include "UI/WarriorWidgetBase.h"
 #include "Utils/WarriorRPGTags.h"
 #include "WarriorFunctionLibrary.h"
 
@@ -264,8 +264,8 @@ void UHeroGameplayAbility_TargetLock::DrawTargetLockWidget()
 	       TEXT("UHeroGameplayAbility_TargetLock::DrawTargetLockWidget — " "TargetLockWidgetClass is null. "
 		       "Assign a valid widget class in the ability's Blueprint defaults."));
 
-	DrawnTargetLockWidget = CreateWidget<UWarriorActivatableWidget>(GetHeroControllerFromActorInfo(),
-	                                                                TargetLockWidgetClass);
+	DrawnTargetLockWidget = CreateWidget<UWarriorWidgetBase>(GetHeroControllerFromActorInfo(),
+	                                                         TargetLockWidgetClass);
 	check(DrawnTargetLockWidget);
 
 	DrawnTargetLockWidget->AddToViewport();

@@ -9,7 +9,7 @@
 #include "DataAssets/StartupData/DataAsset_EnemyStartupData.h"
 #include "Engine/AssetManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "UI/WarriorActivatableWidget.h"
+#include "UI/WarriorWidgetBase.h"
 #include "Utils/WarriorRPGLogCategories.h"
 #include "WarriorFunctionLibrary.h"
 
@@ -92,7 +92,7 @@ void AWarriorEnemyCharacter::BeginPlay()
 	// in Blueprint and may legitimately not be a UWarriorActivatableWidget
 	// (e.g., during early development or when using a placeholder widget class).
 	UUserWidget* Widget = EnemyHealthWidgetComponent->GetUserWidgetObject();
-	if (UWarriorActivatableWidget* HealthWidget = Cast<UWarriorActivatableWidget>(Widget))
+	if (UWarriorWidgetBase* HealthWidget = Cast<UWarriorWidgetBase>(Widget))
 	{
 		HealthWidget->InitEnemyCreatedWidget(this);
 	}

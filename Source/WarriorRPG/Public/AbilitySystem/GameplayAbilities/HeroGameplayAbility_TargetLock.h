@@ -11,7 +11,7 @@
 #include "HeroGameplayAbility_TargetLock.generated.h"
 
 class UInputMappingContext;
-class UWarriorActivatableWidget;
+class UWarriorWidgetBase;
 
 /**
  * Hero-exclusive target lock ability.
@@ -210,7 +210,7 @@ private:
 	 */
 	UPROPERTY(EditDefaultsOnly,
 		Category = "Settings")
-	TSubclassOf<UWarriorActivatableWidget> TargetLockWidgetClass;
+	TSubclassOf<UWarriorWidgetBase> TargetLockWidgetClass;
 
 	/** Interpolation speed for rotating the hero and controller toward the locked target.
 	 *  Higher values snap faster; lower values produce a smoother tracking feel. */
@@ -258,7 +258,7 @@ private:
 
 	/** The widget instance drawn over CurrentLockedActor. Null when not active. */
 	UPROPERTY()
-	TObjectPtr<UWarriorActivatableWidget> DrawnTargetLockWidget = nullptr;
+	TObjectPtr<UWarriorWidgetBase> DrawnTargetLockWidget = nullptr;
 
 	/**
 	 * Cached screen-space size of DrawnTargetLockWidget, in pixels.

@@ -9,7 +9,7 @@
 #include "Components/UI/PawnUIComponent.h"
 #include "EnemyUIComponent.generated.h"
 
-class UWarriorActivatableWidget;
+class UWarriorWidgetBase;
 
 /**
  * UI component for AI-controlled enemy characters.
@@ -24,38 +24,38 @@ class UWarriorActivatableWidget;
  * will be added here as the enemy UI system develops.
  */
 UCLASS(ClassGroup=(Custom),
-	meta=(BlueprintSpawnableComponent))
+    meta=(BlueprintSpawnableComponent))
 class WARRIORRPG_API UEnemyUIComponent : public UPawnUIComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Registers a widget as drawn by this enemy instance.
-	 * Called when a widget is created and attached to this enemy so it
-	 * can be tracked for cleanup on death or despawn.
-	 *
-	 * @param InWidget  The widget to register. Must not be null.
-	 */
-	UFUNCTION(BlueprintCallable)
-	void RegisterEnemyDrawnWidget(UWarriorActivatableWidget* InWidget);
+    /**
+     * Registers a widget as drawn by this enemy instance.
+     * Called when a widget is created and attached to this enemy so it
+     * can be tracked for cleanup on death or despawn.
+     *
+     * @param InWidget  The widget to register. Must not be null.
+     */
+    UFUNCTION(BlueprintCallable)
+    void RegisterEnemyDrawnWidget(UWarriorWidgetBase* InWidget);
 
-	/**
-	 * Removes all widgets registered by this enemy from the viewport and clears
-	 * the internal tracking array. Safe to call when no widgets are registered.
-	 * Typically called from the death ability or on EndPlay to prevent
-	 * orphaned overhead UI elements after the enemy is destroyed.
-	 */
-	UFUNCTION(BlueprintCallable)
-	void RemoveEnemyDrawnWidgetsIfAny();
+    /**
+     * Removes all widgets registered by this enemy from the viewport and clears
+     * the internal tracking array. Safe to call when no widgets are registered.
+     * Typically called from the death ability or on EndPlay to prevent
+     * orphaned overhead UI elements after the enemy is destroyed.
+     */
+    UFUNCTION(BlueprintCallable)
+    void RemoveEnemyDrawnWidgets();
 
 private:
-	/**
-	 * Tracks all widgets created and drawn by this enemy instance.
-	 * Used to clean up overhead UI elements when the enemy dies or despawns.
-	 * UPROPERTY is required to prevent the GC from collecting widgets that are
-	 * still referenced here but have no other strong UObject reference path.
-	 */
-	UPROPERTY()
-	TArray<TObjectPtr<UWarriorActivatableWidget>> EnemyDrawnWidgets;
+    /**
+     * Tracks all widgets created and drawn by this enemy instance.
+     * Used to clean up overhead UI elements when the enemy dies or despawns.
+     * UPROPERTY is required to prevent the GC from collecting widgets that are
+     * still referenced here but have no other strong UObject reference path.
+     */
+    UPROPERTY()
+    TArray<TObjectPtr<UWarriorWidgetBase>> EnemyDrawnWidgets;
 };
