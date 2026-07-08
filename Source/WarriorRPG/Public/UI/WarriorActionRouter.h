@@ -27,18 +27,18 @@
 UCLASS()
 class WARRIORRPG_API UWarriorActionRouter : public UCommonUIActionRouterBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Overrides the input config application to always keep game input active.
-	 * Must NOT call Super — completely replaces the base implementation.
-	 * This prevents any widget activation from changing the input mode
-	 * to UIOnly and stealing input from the game.
-	 *
-	 * @param NewConfig      The input config requested by the activating widget.
-	 * @param bForceRefresh  Whether to force a full input refresh.
-	 */
-	virtual void ApplyUIInputConfig(const FUIInputConfig& NewConfig,
-	                                bool bForceRefresh) override;
+    /**
+     * Overrides the input config application to always keep game input active.
+     * Must NOT call Super — completely replaces the base implementation.
+     * This prevents any widget activation from changing the input mode
+     * to UIOnly and stealing input from the game.
+     *
+     * @param NewConfig      The input config requested by the activating widget.
+     * @param bForceRefresh  Whether to force a full input refresh.
+     */
+    virtual void ApplyUIInputConfig(const FUIInputConfig& NewConfig,
+                                    bool bForceRefresh) override;
 };

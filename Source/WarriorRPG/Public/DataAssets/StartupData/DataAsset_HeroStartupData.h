@@ -27,30 +27,30 @@
 UCLASS()
 class WARRIORRPG_API UDataAsset_HeroStartupData : public UDataAsset_StartupDataBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Grants all startup abilities to the given ASC.
-	 * Calls Super to handle ActivateOnGivenAbilities and ReactiveAbilities,
-	 * then iterates HeroStartupGameplayAbilityInfos to grant input-bound abilities
-	 * with their tags injected into the spec's dynamic source tags.
-	 *
-	 * @param InASC         The ability system component to grant abilities to. Must not be null.
-	 * @param ApplyLevel    The level at which all abilities are granted.
-	 */
-	virtual void GiveToAbilitySystemComponent(UWarriorAbilitySystemComponent* InASC,
-	                                          int32 ApplyLevel = 1) override;
+    /**
+     * Grants all startup abilities to the given ASC.
+     * Calls Super to handle ActivateOnGivenAbilities and ReactiveAbilities,
+     * then iterates HeroStartupGameplayAbilityInfos to grant input-bound abilities
+     * with their tags injected into the spec's dynamic source tags.
+     *
+     * @param InASC         The ability system component to grant abilities to. Must not be null.
+     * @param ApplyLevel    The level at which all abilities are granted.
+     */
+    virtual void GiveToAbilitySystemComponent(UWarriorAbilitySystemComponent* InASC,
+                                              int32 ApplyLevel = 1) override;
 
 private:
-	/**
-	 * Input-bound abilities granted to the hero at possession time.
-	 * These are always present regardless of equipped weapon — e.g., the equip/unequip
-	 * abilities themselves, dodge, or any other weapon-agnostic action.
-	 * TitleProperty = "InputTag" shows the tag name in editor array entries.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		Category = "StartupData",
-		meta = (TitleProperty = "InputTag"))
-	TArray<FHeroGameplayAbilityInfo> HeroStartupGameplayAbilityInfos;
+    /**
+     * Input-bound abilities granted to the hero at possession time.
+     * These are always present regardless of equipped weapon — e.g., the equip/unequip
+     * abilities themselves, dodge, or any other weapon-agnostic action.
+     * TitleProperty = "InputTag" shows the tag name in editor array entries.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        Category = "StartupData",
+        meta = (TitleProperty = "InputTag"))
+    TArray<FHeroGameplayAbilityInfo> HeroStartupGameplayAbilityInfos;
 };

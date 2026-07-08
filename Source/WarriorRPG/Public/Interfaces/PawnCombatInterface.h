@@ -11,7 +11,7 @@ class UPawnCombatComponent;
 UINTERFACE(MinimalAPI)
 class UPawnCombatInterface : public UInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /**
@@ -27,9 +27,9 @@ class UPawnCombatInterface : public UInterface
  */
 class WARRIORRPG_API IPawnCombatInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/** Returns the combat component owned by this pawn, or nullptr if none exists. */
-	virtual UPawnCombatComponent* GetPawnCombatComponent() const = 0;
+    /** Returns the combat component owned by this pawn, or nullptr if none exists. */
+    virtual UPawnCombatComponent* GetPawnCombatComponent() const = 0;
 };

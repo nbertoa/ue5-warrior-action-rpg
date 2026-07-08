@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class WarriorRPGEditorTarget : TargetRules
 {
-	public WarriorRPGEditorTarget( TargetInfo Target) : base(Target)
+	public WarriorRPGEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V5;

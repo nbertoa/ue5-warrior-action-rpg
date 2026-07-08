@@ -17,5 +17,5 @@
 UCLASS()
 class WARRIORRPG_API AWarriorBaseGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };

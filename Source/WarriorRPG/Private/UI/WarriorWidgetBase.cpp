@@ -10,11 +10,17 @@ void UWarriorWidgetBase::NativeOnInitialized()
 
     if (!ensureMsgf(PawnUIInterface,
                     TEXT("[UWarriorWidgetBase] NativeOnInitialized — owning player pawn [%s] " "does not implement IPawnUIInterface. Verify the pawn class is correct."),
-                    *GetNameSafe(GetOwningPlayerPawn()))) { return; }
+                    *GetNameSafe(GetOwningPlayerPawn())))
+    {
+        return;
+    }
 
     UHeroUIComponent* HeroUIComponent = PawnUIInterface->GetHeroUIComponent();
 
-    if (!HeroUIComponent) { return; }
+    if (!HeroUIComponent)
+    {
+        return;
+    }
 
     BP_OnOwningHeroUIComponentInitialized(HeroUIComponent);
 }
@@ -25,13 +31,19 @@ void UWarriorWidgetBase::InitEnemyCreatedWidget(AActor* OwningEnemyActor)
 
     if (!ensureMsgf(PawnUIInterface,
                     TEXT("[UWarriorWidgetBase] InitEnemyCreatedWidget — OwningEnemyActor [%s] " "does not implement IPawnUIInterface."),
-                    *GetNameSafe(OwningEnemyActor))) { return; }
+                    *GetNameSafe(OwningEnemyActor)))
+    {
+        return;
+    }
 
     UEnemyUIComponent* EnemyUIComponent = PawnUIInterface->GetEnemyUIComponent();
 
     if (!ensureMsgf(EnemyUIComponent,
                     TEXT("[UWarriorWidgetBase] InitEnemyCreatedWidget — EnemyUIComponent is null " "on actor [%s]."),
-                    *GetNameSafe(OwningEnemyActor))) { return; }
+                    *GetNameSafe(OwningEnemyActor)))
+    {
+        return;
+    }
 
     BP_OnOwningEnemyUIComponentInitialized(EnemyUIComponent);
 }

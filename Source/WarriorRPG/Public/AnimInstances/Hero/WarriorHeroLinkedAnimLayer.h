@@ -31,23 +31,23 @@ class UWarriorHeroAnimInstance;
 UCLASS()
 class WARRIORRPG_API UWarriorHeroLinkedAnimLayer : public UWarriorBaseAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Returns the main AnimInstance of the owning SkeletalMeshComponent, cast to
-	 * UWarriorHeroAnimInstance. Use this in the linked layer's AnimGraph to read
-	 * locomotion speed, combat state, or any other data computed by the main ABP.
-	 *
-	 * Marked BlueprintThreadSafe so it can be called from the AnimGraph's worker thread
-	 * during NativeThreadSafeUpdateAnimation. The underlying GetAnimInstance() call is
-	 * safe to make from a non-game thread in this context.
-	 *
-	 * @return  The hero's main AnimInstance. CastChecked will crash in development
-	 *          if the owning character's AnimInstance is not UWarriorHeroAnimInstance —
-	 *          this indicates the Linked Layer was assigned to the wrong character Blueprint.
-	 */
-	UFUNCTION(BlueprintPure,
-		meta = (BlueprintThreadSafe))
-	UWarriorHeroAnimInstance* GetHeroAnimInstance() const;
+    /**
+     * Returns the main AnimInstance of the owning SkeletalMeshComponent, cast to
+     * UWarriorHeroAnimInstance. Use this in the linked layer's AnimGraph to read
+     * locomotion speed, combat state, or any other data computed by the main ABP.
+     *
+     * Marked BlueprintThreadSafe so it can be called from the AnimGraph's worker thread
+     * during NativeThreadSafeUpdateAnimation. The underlying GetAnimInstance() call is
+     * safe to make from a non-game thread in this context.
+     *
+     * @return  The hero's main AnimInstance. CastChecked will crash in development
+     *          if the owning character's AnimInstance is not UWarriorHeroAnimInstance —
+     *          this indicates the Linked Layer was assigned to the wrong character Blueprint.
+     */
+    UFUNCTION(BlueprintPure,
+        meta = (BlueprintThreadSafe))
+    UWarriorHeroAnimInstance* GetHeroAnimInstance() const;
 };

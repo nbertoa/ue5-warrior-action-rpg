@@ -26,22 +26,22 @@ class UWarriorActivatableWidget;
  * Changes here do not require recompilation — only a cook or PIE restart.
  */
 UCLASS(Config = Game,
-	DefaultConfig,
-	meta = (DisplayName = "Warrior UI Settings"))
+    DefaultConfig,
+    meta = (DisplayName = "Warrior UI Settings"))
 class WARRIORRPG_API UWarriorUISettings : public UDeveloperSettings
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Maps a Gameplay Tag (UI.Widget hierarchy) to the widget Blueprint class
-	 * that should be instantiated when that tag is requested.
-	 * ForceInlineRow displays the class picker inline in the Details panel
-	 * instead of collapsing it behind a dropdown, improving editor usability.
-	 */
-	UPROPERTY(Config,
-		EditAnywhere,
-		Category = "Widget Reference",
-		meta = (ForceInlineRow, Categories = "WarriorRPGTags.UI.Widget"))
-	TMap<FGameplayTag, TSubclassOf<UWarriorActivatableWidget>> WidgetClassByTag;
+    /**
+     * Maps a Gameplay Tag (UI.Widget hierarchy) to the widget Blueprint class
+     * that should be instantiated when that tag is requested.
+     * ForceInlineRow displays the class picker inline in the Details panel
+     * instead of collapsing it behind a dropdown, improving editor usability.
+     */
+    UPROPERTY(Config,
+        EditAnywhere,
+        Category = "Widget Reference",
+        meta = (ForceInlineRow, Categories = "WarriorRPGTags.UI.Widget"))
+    TMap<FGameplayTag, TSubclassOf<UWarriorActivatableWidget>> WidgetClassByTag;
 };

@@ -18,19 +18,19 @@
 UCLASS()
 class WARRIORRPG_API UWarriorBaseAnimInstance : public UAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	/**
-	 * Returns true if the owning pawn's ASC has the given gameplay tag.
-	 * Thread-safe — can be called from the AnimGraph worker thread via
-	 * NativeThreadSafeUpdateAnimation without risking data tearing.
-	 * Returns false if the owning pawn is null (e.g., during animation preview).
-	 *
-	 * @param TagToCheck    The gameplay tag to query on the owning pawn's ASC.
-	 * @return              True if the pawn's ASC has a matching tag, false otherwise.
-	 */
-	UFUNCTION(BlueprintPure,
-		meta = (BlueprintThreadSafe))
-	bool DoesOwnerHaveTag(FGameplayTag TagToCheck) const;
+    /**
+     * Returns true if the owning pawn's ASC has the given gameplay tag.
+     * Thread-safe — can be called from the AnimGraph worker thread via
+     * NativeThreadSafeUpdateAnimation without risking data tearing.
+     * Returns false if the owning pawn is null (e.g., during animation preview).
+     *
+     * @param TagToCheck    The gameplay tag to query on the owning pawn's ASC.
+     * @return              True if the pawn's ASC has a matching tag, false otherwise.
+     */
+    UFUNCTION(BlueprintPure,
+        meta = (BlueprintThreadSafe))
+    bool DoesOwnerHaveTag(FGameplayTag TagToCheck) const;
 };

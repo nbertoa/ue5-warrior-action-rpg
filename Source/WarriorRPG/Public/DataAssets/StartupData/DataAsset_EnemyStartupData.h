@@ -25,27 +25,27 @@ class UWarriorAbilitySystemComponent;
 UCLASS()
 class WARRIORRPG_API UDataAsset_EnemyStartupData : public UDataAsset_StartupDataBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Grants base startup abilities via Super, then grants all
-	 * EnemyCombatAbilities to the provided ASC.
-	 * Called from AWarriorEnemyCharacter::OnStartupDataLoaded after async load completes.
-	 *
-	 * @param InASC         The ability system component to grant abilities to. Must not be null.
-	 * @param ApplyLevel    The level at which all abilities are granted. Defaults to 1.
-	 */
-	virtual void GiveToAbilitySystemComponent(UWarriorAbilitySystemComponent* InASC,
-	                                          int32 ApplyLevel = 1) override;
+    /**
+     * Grants base startup abilities via Super, then grants all
+     * EnemyCombatAbilities to the provided ASC.
+     * Called from AWarriorEnemyCharacter::OnStartupDataLoaded after async load completes.
+     *
+     * @param InASC         The ability system component to grant abilities to. Must not be null.
+     * @param ApplyLevel    The level at which all abilities are granted. Defaults to 1.
+     */
+    virtual void GiveToAbilitySystemComponent(UWarriorAbilitySystemComponent* InASC,
+                                              int32 ApplyLevel = 1) override;
 
 private:
-	/**
-	 * Combat abilities specific to this enemy type.
-	 * Granted directly to the ASC without input tag routing —
-	 * enemies don't use player input to activate abilities.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		Category = "StartupData")
-	TArray<TSubclassOf<UWarriorEnemyGameplayAbility>> EnemyCombatAbilities;
+    /**
+     * Combat abilities specific to this enemy type.
+     * Granted directly to the ASC without input tag routing —
+     * enemies don't use player input to activate abilities.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        Category = "StartupData")
+    TArray<TSubclassOf<UWarriorEnemyGameplayAbility>> EnemyCombatAbilities;
 };

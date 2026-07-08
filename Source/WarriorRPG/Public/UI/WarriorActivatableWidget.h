@@ -28,10 +28,10 @@ class UHeroUIComponent;
 UENUM(BlueprintType)
 enum class EWarriorWidgetInputMode : uint8
 {
-	Default,
-	Game,
-	GameAndMenu,
-	Menu
+    Default,
+    Game,
+    GameAndMenu,
+    Menu
 };
 
 /**
@@ -53,99 +53,99 @@ enum class EWarriorWidgetInputMode : uint8
  * UCommonActivatableWidget directly.
  */
 UCLASS(Abstract,
-	BlueprintType,
-	meta = (DisableNativeTick))
+    BlueprintType,
+    meta = (DisableNativeTick))
 class WARRIORRPG_API UWarriorActivatableWidget : public UCommonActivatableWidget
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Initializes this widget as an enemy-owned widget by resolving the
-	 * UEnemyUIComponent from the given enemy actor and forwarding it to Blueprint.
-	 * Call this manually after creating a widget that is owned by an enemy pawn
-	 * rather than the player — enemy widgets are not pushed via UWarriorUISubsystem
-	 * and do not go through the normal NativeOnActivated hero resolution path.
-	 *
-	 * Crashes in development if OwningEnemyActor is null, does not implement
-	 * IPawnUIInterface, or does not have a valid UEnemyUIComponent.
-	 *
-	 * @param OwningEnemyActor  The enemy actor that owns this widget. Must not be null
-	 *                          and must implement IPawnUIInterface.
-	 */
-	UFUNCTION(BlueprintCallable,
-		Category = "Warrior|UI")
-	void InitEnemyCreatedWidget(AActor* OwningEnemyActor);
+    /**
+     * Initializes this widget as an enemy-owned widget by resolving the
+     * UEnemyUIComponent from the given enemy actor and forwarding it to Blueprint.
+     * Call this manually after creating a widget that is owned by an enemy pawn
+     * rather than the player — enemy widgets are not pushed via UWarriorUISubsystem
+     * and do not go through the normal NativeOnActivated hero resolution path.
+     *
+     * Crashes in development if OwningEnemyActor is null, does not implement
+     * IPawnUIInterface, or does not have a valid UEnemyUIComponent.
+     *
+     * @param OwningEnemyActor  The enemy actor that owns this widget. Must not be null
+     *                          and must implement IPawnUIInterface.
+     */
+    UFUNCTION(BlueprintCallable,
+        Category = "Warrior|UI")
+    void InitEnemyCreatedWidget(AActor* OwningEnemyActor);
 
 protected:
-	//~ Begin UCommonActivatableWidget Interface
-	/**
-	 * Returns the input config this widget requests when activated.
-	 * Driven by InputConfig and GameMouseCaptureMode — set these in Blueprint defaults
-	 * to control how this widget interacts with game input.
-	 * Default returns an empty TOptional — no input mode change, game receives everything.
-	 */
-	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
+    //~ Begin UCommonActivatableWidget Interface
+    /**
+     * Returns the input config this widget requests when activated.
+     * Driven by InputConfig and GameMouseCaptureMode — set these in Blueprint defaults
+     * to control how this widget interacts with game input.
+     * Default returns an empty TOptional — no input mode change, game receives everything.
+     */
+    virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 
-	/**
-	 * Called when this widget is activated and fully visible.
-	 * Resolves the owning pawn's UHeroUIComponent and forwards it to Blueprint
-	 * via BP_OnOwningHeroUIComponentInitialized so delegates can be bound.
-	 */
-	virtual void NativeOnActivated() override;
-	//~ End UCommonActivatableWidget Interface
+    /**
+     * Called when this widget is activated and fully visible.
+     * Resolves the owning pawn's UHeroUIComponent and forwards it to Blueprint
+     * via BP_OnOwningHeroUIComponentInitialized so delegates can be bound.
+     */
+    virtual void NativeOnActivated() override;
+    //~ End UCommonActivatableWidget Interface
 
-	/**
-	 * Called during NativeOnActivated when the owning pawn implements IPawnUIInterface
-	 * and returns a valid UHeroUIComponent.
-	 * Implement this in Blueprint to bind health, rage, and other UI delegates.
-	 *
-	 * @param OwningHeroUIComponent     Guaranteed non-null when this event fires.
-	 */
-	UFUNCTION(BlueprintImplementableEvent,
-		Category = "Warrior|UI",
-		meta = (DisplayName = "On Owning Hero UI Component Initialized"))
-	void BP_OnOwningHeroUIComponentInitialized(UHeroUIComponent* OwningHeroUIComponent);
+    /**
+     * Called during NativeOnActivated when the owning pawn implements IPawnUIInterface
+     * and returns a valid UHeroUIComponent.
+     * Implement this in Blueprint to bind health, rage, and other UI delegates.
+     *
+     * @param OwningHeroUIComponent     Guaranteed non-null when this event fires.
+     */
+    UFUNCTION(BlueprintImplementableEvent,
+        Category = "Warrior|UI",
+        meta = (DisplayName = "On Owning Hero UI Component Initialized"))
+    void BP_OnOwningHeroUIComponentInitialized(UHeroUIComponent* OwningHeroUIComponent);
 
-	/**
-	 * Called by InitEnemyCreatedWidget when a valid UEnemyUIComponent is found.
-	 * Implement this in Blueprint to bind enemy-specific UI delegates.
-	 *
-	 * @param OwningEnemyUIComponent    Guaranteed non-null when this event fires.
-	 */
-	UFUNCTION(BlueprintImplementableEvent,
-		Category = "Warrior|UI",
-		meta = (DisplayName = "On Owning Enemy UI Component Initialized"))
-	void BP_OnOwningEnemyUIComponentInitialized(UEnemyUIComponent* OwningEnemyUIComponent);
+    /**
+     * Called by InitEnemyCreatedWidget when a valid UEnemyUIComponent is found.
+     * Implement this in Blueprint to bind enemy-specific UI delegates.
+     *
+     * @param OwningEnemyUIComponent    Guaranteed non-null when this event fires.
+     */
+    UFUNCTION(BlueprintImplementableEvent,
+        Category = "Warrior|UI",
+        meta = (DisplayName = "On Owning Enemy UI Component Initialized"))
+    void BP_OnOwningEnemyUIComponentInitialized(UEnemyUIComponent* OwningEnemyUIComponent);
 
-	/**
-	 * Returns the hero player controller that owns this widget, cached on first access.
-	 *
-	 * @return The owning AWarriorHeroController, or nullptr if destroyed.
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|UI")
-	AWarriorHeroController* GetOwningWarriorHeroController();
+    /**
+     * Returns the hero player controller that owns this widget, cached on first access.
+     *
+     * @return The owning AWarriorHeroController, or nullptr if destroyed.
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|UI")
+    AWarriorHeroController* GetOwningWarriorHeroController();
 
-	/**
-	 * Controls how this widget interacts with game input when activated.
-	 * Default = no change, game receives everything.
-	 * Set to Menu for pause menus, options, main menu.
-	 * Set to Game or GameAndMenu for in-game overlays that need some UI interaction.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		Category = "Input")
-	EWarriorWidgetInputMode InputConfig = EWarriorWidgetInputMode::Default;
+    /**
+     * Controls how this widget interacts with game input when activated.
+     * Default = no change, game receives everything.
+     * Set to Menu for pause menus, options, main menu.
+     * Set to Game or GameAndMenu for in-game overlays that need some UI interaction.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        Category = "Input")
+    EWarriorWidgetInputMode InputConfig = EWarriorWidgetInputMode::Default;
 
-	/**
-	 * Mouse capture behavior when InputConfig is Game or GameAndMenu.
-	 * Has no effect when InputConfig is Default or Menu.
-	 * CapturePermanently is the correct setting for most gameplay scenarios.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		Category = "Input")
-	EMouseCaptureMode GameMouseCaptureMode = EMouseCaptureMode::CapturePermanently;
+    /**
+     * Mouse capture behavior when InputConfig is Game or GameAndMenu.
+     * Has no effect when InputConfig is Default or Menu.
+     * CapturePermanently is the correct setting for most gameplay scenarios.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        Category = "Input")
+    EMouseCaptureMode GameMouseCaptureMode = EMouseCaptureMode::CapturePermanently;
 
 private:
-	TWeakObjectPtr<AWarriorHeroController> CachedOwningPC;
+    TWeakObjectPtr<AWarriorHeroController> CachedOwningPC;
 };

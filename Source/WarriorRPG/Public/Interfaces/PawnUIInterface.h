@@ -22,7 +22,7 @@ class UPawnUIComponent;
 UINTERFACE(MinimalAPI)
 class UPawnUIInterface : public UInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /**
@@ -38,34 +38,34 @@ class UPawnUIInterface : public UInterface
  */
 class WARRIORRPG_API IPawnUIInterface
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Returns the base UI component owned by this pawn.
-	 * Used by the attribute set to broadcast health changes to the UI
-	 * without knowing the concrete character type.
-	 *
-	 * @return The pawn's UPawnUIComponent. Must not return null on any
-	 *         character that has a UI — pure virtual enforces this contract.
-	 */
-	virtual UPawnUIComponent* GetPawnUIComponent() const = 0;
+    /**
+     * Returns the base UI component owned by this pawn.
+     * Used by the attribute set to broadcast health changes to the UI
+     * without knowing the concrete character type.
+     *
+     * @return The pawn's UPawnUIComponent. Must not return null on any
+     *         character that has a UI — pure virtual enforces this contract.
+     */
+    virtual UPawnUIComponent* GetPawnUIComponent() const = 0;
 
-	/**
-	 * Returns the hero-specific UI component, or nullptr if this pawn is not a hero.
-	 * Default implementation returns nullptr — only AWarriorHeroCharacter overrides this.
-	 * Allows the attribute set to broadcast rage changes to the hero UI without casting.
-	 *
-	 * @return The hero's UHeroUIComponent, or nullptr for non-hero pawns.
-	 */
-	virtual UHeroUIComponent* GetHeroUIComponent() const;
+    /**
+     * Returns the hero-specific UI component, or nullptr if this pawn is not a hero.
+     * Default implementation returns nullptr — only AWarriorHeroCharacter overrides this.
+     * Allows the attribute set to broadcast rage changes to the hero UI without casting.
+     *
+     * @return The hero's UHeroUIComponent, or nullptr for non-hero pawns.
+     */
+    virtual UHeroUIComponent* GetHeroUIComponent() const;
 
-	/**
-	 * Returns the enemy-specific UI component, or nullptr if this pawn is not an enemy.
-	 * Default implementation returns nullptr — only AWarriorEnemyCharacter overrides this.
-	 * Allows external systems to access enemy-exclusive UI elements without casting.
-	 *
-	 * @return The enemy's UEnemyUIComponent, or nullptr for non-enemy pawns.
-	 */
-	virtual UEnemyUIComponent* GetEnemyUIComponent() const;
+    /**
+     * Returns the enemy-specific UI component, or nullptr if this pawn is not an enemy.
+     * Default implementation returns nullptr — only AWarriorEnemyCharacter overrides this.
+     * Allows external systems to access enemy-exclusive UI elements without casting.
+     *
+     * @return The enemy's UEnemyUIComponent, or nullptr for non-enemy pawns.
+     */
+    virtual UEnemyUIComponent* GetEnemyUIComponent() const;
 };

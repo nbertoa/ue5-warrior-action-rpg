@@ -21,54 +21,54 @@ class UEnemyCombatComponent;
 UCLASS()
 class WARRIORRPG_API UWarriorEnemyGameplayAbility : public UWarriorGameplayAbility
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Returns the enemy character that owns this ability, cached on first access.
-	 * The cached reference is invalidated automatically if the character is destroyed.
-	 *
-	 * @return The owning AWarriorEnemyCharacter. Crashes in development if the avatar
-	 *         is not an enemy character, which indicates a misconfiguration (ability
-	 *         granted to the wrong character type).
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|Ability")
-	AWarriorEnemyCharacter* GetEnemyCharacterFromActorInfo();
+    /**
+     * Returns the enemy character that owns this ability, cached on first access.
+     * The cached reference is invalidated automatically if the character is destroyed.
+     *
+     * @return The owning AWarriorEnemyCharacter. Crashes in development if the avatar
+     *         is not an enemy character, which indicates a misconfiguration (ability
+     *         granted to the wrong character type).
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|Ability")
+    AWarriorEnemyCharacter* GetEnemyCharacterFromActorInfo();
 
-	/**
-	 * Returns the enemy combat component from the cached enemy character.
-	 * Resolves through GetEnemyCharacterFromActorInfo — if the character is valid,
-	 * its combat component is guaranteed to exist as a default subobject.
-	 *
-	 * @return The owning UEnemyCombatComponent. Crashes in development if missing,
-	 *         which indicates the component was not created in the constructor.
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|Ability")
-	UEnemyCombatComponent* GetEnemyCombatComponentFromActorInfo();
+    /**
+     * Returns the enemy combat component from the cached enemy character.
+     * Resolves through GetEnemyCharacterFromActorInfo — if the character is valid,
+     * its combat component is guaranteed to exist as a default subobject.
+     *
+     * @return The owning UEnemyCombatComponent. Crashes in development if missing,
+     *         which indicates the component was not created in the constructor.
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|Ability")
+    UEnemyCombatComponent* GetEnemyCombatComponentFromActorInfo();
 
-	/**
-	 * Builds a GameplayEffectSpecHandle pre-configured for enemy melee damage.
-	 * Evaluates InDamageScalableFloat at the current ability level to produce the
-	 * final damage magnitude, then injects it as a SetByCaller value under
-	 * Shared::SetByCaller::BaseDamage so the GE reads it at application time.
-	 *
-	 * @param EffectClass               The Gameplay Effect class to instantiate. Must not be null.
-	 * @param InDamageScalableFloat     Curve-based damage value evaluated at the ability's level.
-	 *                                  Allows per-level damage scaling without modifying the GE asset.
-	 * @return                          A configured FGameplayEffectSpecHandle ready to be applied.
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|Ability")
-	FGameplayEffectSpecHandle MakeEnemyDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> EffectClass,
-	                                                          const FScalableFloat& InDamageScalableFloat);
+    /**
+     * Builds a GameplayEffectSpecHandle pre-configured for enemy melee damage.
+     * Evaluates InDamageScalableFloat at the current ability level to produce the
+     * final damage magnitude, then injects it as a SetByCaller value under
+     * Shared::SetByCaller::BaseDamage so the GE reads it at application time.
+     *
+     * @param EffectClass               The Gameplay Effect class to instantiate. Must not be null.
+     * @param InDamageScalableFloat     Curve-based damage value evaluated at the ability's level.
+     *                                  Allows per-level damage scaling without modifying the GE asset.
+     * @return                          A configured FGameplayEffectSpecHandle ready to be applied.
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|Ability")
+    FGameplayEffectSpecHandle MakeEnemyDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> EffectClass,
+                                                              const FScalableFloat& InDamageScalableFloat);
 
 private:
-	/**
-	 * Cached weak reference to the owning enemy character.
-	 * TWeakObjectPtr automatically becomes invalid if the character is destroyed,
-	 * making it safe to hold references across frames without risking dangling pointers.
-	 */
-	TWeakObjectPtr<AWarriorEnemyCharacter> CachedWarriorEnemyCharacter;
+    /**
+     * Cached weak reference to the owning enemy character.
+     * TWeakObjectPtr automatically becomes invalid if the character is destroyed,
+     * making it safe to hold references across frames without risking dangling pointers.
+     */
+    TWeakObjectPtr<AWarriorEnemyCharacter> CachedWarriorEnemyCharacter;
 };

@@ -10,7 +10,10 @@
 
 UWarriorUISubsystem* UWarriorUISubsystem::Get(const UObject* WorldContextObject)
 {
-    if (!GEngine) { return nullptr; }
+    if (!GEngine)
+    {
+        return nullptr;
+    }
 
     // Assert mode: if WorldContextObject has no world, this is a programming error
     // and we want to know about it immediately rather than silently returning null.
@@ -24,7 +27,10 @@ bool UWarriorUISubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
     // Never create on dedicated servers — no UI is needed and Common UI
     // assets may not be loaded in a server-only cook.
-    if (CastChecked<UGameInstance>(Outer)->IsDedicatedServerInstance()) { return false; }
+    if (CastChecked<UGameInstance>(Outer)->IsDedicatedServerInstance())
+    {
+        return false;
+    }
 
     // If a subclass of this subsystem exists, let the most-derived class
     // take ownership. The engine will instantiate that subclass instead.
@@ -67,7 +73,10 @@ UWarriorActivatableWidget* UWarriorUISubsystem::PushWidgetToStack(APlayerControl
     // Setting it after AddWidget would be too late — the widget may already be
     // trying to access the controller during its activation chain.
     UWarriorActivatableWidget* NewWidget = TargetStack->AddWidget<UWarriorActivatableWidget>(InWidgetClass,
-                                                                                             [InPlayerController](UWarriorActivatableWidget& WidgetToInit) { WidgetToInit.SetOwningPlayer(InPlayerController); });
+                                                                                             [InPlayerController](UWarriorActivatableWidget& WidgetToInit)
+                                                                                             {
+                                                                                                 WidgetToInit.SetOwningPlayer(InPlayerController);
+                                                                                             });
 
     checkf(NewWidget,
            TEXT("UWarriorUISubsystem::PushWidgetToStack — " "AddWidget returned null for class [%s]. " "Verify the widget class is valid and not abstract."),

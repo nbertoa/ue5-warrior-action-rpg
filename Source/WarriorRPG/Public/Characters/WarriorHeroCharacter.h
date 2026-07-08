@@ -32,7 +32,10 @@ public:
     AWarriorHeroCharacter();
 
     /** Returns the hero's combat component for external systems that need to query combat state. */
-    FORCEINLINE UHeroCombatComponent* GetHeroCombatComponent() const { return HeroCombatComponent; }
+    FORCEINLINE UHeroCombatComponent* GetHeroCombatComponent() const
+    {
+        return HeroCombatComponent;
+    }
 
     //~ Begin IPawnCombatInterface Interface
     virtual UPawnCombatComponent* GetPawnCombatComponent() const override;

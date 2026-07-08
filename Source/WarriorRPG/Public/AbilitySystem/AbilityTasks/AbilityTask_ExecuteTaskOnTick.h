@@ -35,34 +35,34 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAbilityTaskTickDelegate,
 UCLASS()
 class WARRIORRPG_API UAbilityTask_ExecuteTaskOnTick : public UAbilityTask
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UAbilityTask_ExecuteTaskOnTick();
+    UAbilityTask_ExecuteTaskOnTick();
 
-	/**
-	 * Factory method — creates and returns the task bound to the owning ability.
-	 * Must be called from within an active UGameplayAbility.
-	 * HidePin + DefaultToSelf hide the OwningAbility pin in Blueprint graphs;
-	 * BlueprintInternalUseOnly prevents direct use — callers must go through this factory.
-	 *
-	 * @param OwningAbility   The ability that owns and drives this task. Must not be null.
-	 * @return                The created task, ready for ReadyForActivation().
-	 */
-	UFUNCTION(BlueprintCallable,
-		Category = "Warrior|AbilityTasks",
-		meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "true"))
-	static UAbilityTask_ExecuteTaskOnTick* ExecuteTaskOnTick(UGameplayAbility* OwningAbility);
+    /**
+     * Factory method — creates and returns the task bound to the owning ability.
+     * Must be called from within an active UGameplayAbility.
+     * HidePin + DefaultToSelf hide the OwningAbility pin in Blueprint graphs;
+     * BlueprintInternalUseOnly prevents direct use — callers must go through this factory.
+     *
+     * @param OwningAbility   The ability that owns and drives this task. Must not be null.
+     * @return                The created task, ready for ReadyForActivation().
+     */
+    UFUNCTION(BlueprintCallable,
+        Category = "Warrior|AbilityTasks",
+        meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "true"))
+    static UAbilityTask_ExecuteTaskOnTick* ExecuteTaskOnTick(UGameplayAbility* OwningAbility);
 
-	//~ Begin UGameplayTask Interface
-	virtual void TickTask(float DeltaTime) override;
-	//~ End UGameplayTask Interface
+    //~ Begin UGameplayTask Interface
+    virtual void TickTask(float DeltaTime) override;
+    //~ End UGameplayTask Interface
 
-	/**
-	 * Broadcast every frame while the task is active and the owning ability is valid.
-	 * Bind to this delegate from the owning ability to receive per-frame callbacks.
-	 * The task calls EndTask() automatically if the ability becomes invalid mid-tick.
-	 */
-	UPROPERTY(BlueprintAssignable)
-	FOnAbilityTaskTickDelegate OnAbilityTaskTick;
+    /**
+     * Broadcast every frame while the task is active and the owning ability is valid.
+     * Bind to this delegate from the owning ability to receive per-frame callbacks.
+     * The task calls EndTask() automatically if the ability becomes invalid mid-tick.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FOnAbilityTaskTickDelegate OnAbilityTaskTick;
 };

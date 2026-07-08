@@ -2,10 +2,10 @@
 
 UHeroUIComponent* IPawnUIInterface::GetHeroUIComponent() const
 {
-	return nullptr;
+    return nullptr;
 }
 
 UEnemyUIComponent* IPawnUIInterface::GetEnemyUIComponent() const
 {
-	return nullptr;
+    return nullptr;
 }

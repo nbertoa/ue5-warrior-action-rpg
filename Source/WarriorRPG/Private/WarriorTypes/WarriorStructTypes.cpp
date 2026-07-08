@@ -8,7 +8,7 @@
 
 bool FHeroGameplayAbilityInfo::IsValid() const
 {
-	// Both fields must be set — a missing tag means the ASC can never find the ability
-	// via input, and a missing class means there is nothing to grant.
-	return InputTag.IsValid() && GameplayAbility != nullptr;
+    // Both fields must be set — a missing tag means the ASC can never find the ability
+    // via input, and a missing class means there is nothing to grant.
+    return InputTag.IsValid() && GameplayAbility != nullptr;
 }

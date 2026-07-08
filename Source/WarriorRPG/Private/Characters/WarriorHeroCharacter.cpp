@@ -71,13 +71,25 @@ AWarriorHeroCharacter::AWarriorHeroCharacter()
     HeroUIComponent = CreateDefaultSubobject<UHeroUIComponent>(TEXT("HeroUIComponent"));
 }
 
-UPawnCombatComponent* AWarriorHeroCharacter::GetPawnCombatComponent() const { return HeroCombatComponent; }
+UPawnCombatComponent* AWarriorHeroCharacter::GetPawnCombatComponent() const
+{
+    return HeroCombatComponent;
+}
 
-UPawnUIComponent* AWarriorHeroCharacter::GetPawnUIComponent() const { return HeroUIComponent; }
+UPawnUIComponent* AWarriorHeroCharacter::GetPawnUIComponent() const
+{
+    return HeroUIComponent;
+}
 
-UHeroUIComponent* AWarriorHeroCharacter::GetHeroUIComponent() const { return HeroUIComponent; }
+UHeroUIComponent* AWarriorHeroCharacter::GetHeroUIComponent() const
+{
+    return HeroUIComponent;
+}
 
-void AWarriorHeroCharacter::BeginPlay() { Super::BeginPlay(); }
+void AWarriorHeroCharacter::BeginPlay()
+{
+    Super::BeginPlay();
+}
 
 void AWarriorHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -171,7 +183,10 @@ void AWarriorHeroCharacter::PossessedBy(AController* NewController)
 
     // If the designer didn't assign startup data, skip gracefully.
     // The base class already warned via ensureMsgf — no need to log again.
-    if (CharacterStartupData.IsNull()) { return; }
+    if (CharacterStartupData.IsNull())
+    {
+        return;
+    }
 
     // LoadSynchronous blocks briefly — acceptable here because PossessedBy fires once at
     // spawn and the asset is lightweight (ability class references, no heavy content).
@@ -179,7 +194,10 @@ void AWarriorHeroCharacter::PossessedBy(AController* NewController)
 
     if (!ensureMsgf(LoadedData,
                     TEXT("%s: Failed to load CharacterStartupData. " "The asset path is set but the asset could not be loaded from disk."),
-                    *GetName())) { return; }
+                    *GetName()))
+    {
+        return;
+    }
 
     // Hand off to the data asset — it grants every configured ability to the ASC.
     LoadedData->GiveToAbilitySystemComponent(WarriorAbilitySystemComponent);
@@ -218,9 +236,15 @@ void AWarriorHeroCharacter::Input_Look(const FInputActionValue& InputActionValue
 
     // Apply rotation to the controller — the spring arm's bUsePawnControlRotation
     // picks these values up automatically to orbit the camera around the character.
-    if (LookAxisVector.X != 0.0f) { AddControllerYawInput(LookAxisVector.X); }
+    if (LookAxisVector.X != 0.0f)
+    {
+        AddControllerYawInput(LookAxisVector.X);
+    }
 
-    if (LookAxisVector.Y != 0.0f) { AddControllerPitchInput(LookAxisVector.Y); }
+    if (LookAxisVector.Y != 0.0f)
+    {
+        AddControllerPitchInput(LookAxisVector.Y);
+    }
 }
 
 void AWarriorHeroCharacter::Input_SwitchTargetTriggered(const FInputActionValue& InputActionValue)

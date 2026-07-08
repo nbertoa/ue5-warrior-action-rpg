@@ -31,17 +31,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPercentChangedDelegate,
  * UEnemyUIComponent can add threat or phase indicators).
  */
 UCLASS(ClassGroup=(Custom),
-	meta=(BlueprintSpawnableComponent))
+    meta=(BlueprintSpawnableComponent))
 class WARRIORRPG_API UPawnUIComponent : public UPawnExtensionComponentBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Broadcast by the attribute set whenever CurrentHealth changes.
-	 * The value is pre-normalized — listeners receive CurrentHealth / MaxHealth in [0, 1].
-	 * Bind to this in the health bar widget to update without polling.
-	 */
-	UPROPERTY(BlueprintAssignable)
-	FOnPercentChangedDelegate OnCurrentHealthChanged;
+    /**
+     * Broadcast by the attribute set whenever CurrentHealth changes.
+     * The value is pre-normalized — listeners receive CurrentHealth / MaxHealth in [0, 1].
+     * Bind to this in the health bar widget to update without polling.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FOnPercentChangedDelegate OnCurrentHealthChanged;
 };

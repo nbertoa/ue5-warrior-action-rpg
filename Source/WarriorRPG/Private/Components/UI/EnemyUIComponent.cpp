@@ -12,21 +12,30 @@ void UEnemyUIComponent::RegisterEnemyDrawnWidget(UWarriorWidgetBase* InWidget)
     // causing RemoveEnemyDrawnWidgetsIfAny to skip a widget that was never cleaned up.
     if (!ensureMsgf(IsValid(InWidget),
                     TEXT("[UEnemyUIComponent] RegisterEnemyDrawnWidget called with a null or " "pending-kill widget on %s. Verify the widget was created successfully " "before registering it."),
-                    *GetOwner()->GetName())) { return; }
+                    *GetOwner()->GetName()))
+    {
+        return;
+    }
 
     EnemyDrawnWidgets.Add(InWidget);
 }
 
 void UEnemyUIComponent::RemoveEnemyDrawnWidgets()
 {
-    if (EnemyDrawnWidgets.IsEmpty()) { return; }
+    if (EnemyDrawnWidgets.IsEmpty())
+    {
+        return;
+    }
 
     for (UWarriorWidgetBase* DrawnWidget : EnemyDrawnWidgets)
     {
         // IsValid guard: the widget may have been collected or explicitly destroyed
         // between registration and this cleanup call (e.g., manual RemoveFromParent
         // elsewhere, or GC during a level transition). Skip rather than crash.
-        if (!IsValid(DrawnWidget)) { continue; }
+        if (!IsValid(DrawnWidget))
+        {
+            continue;
+        }
 
         DrawnWidget->RemoveFromParent();
     }

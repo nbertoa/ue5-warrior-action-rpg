@@ -27,8 +27,8 @@ class UWarriorAbilitySystemComponent;
 UENUM(BlueprintType)
 enum class EWarriorAbilityActivationPolicy : uint8
 {
-	OnTriggered,
-	OnGiven
+    OnTriggered,
+    OnGiven
 };
 
 /**
@@ -43,102 +43,101 @@ enum class EWarriorAbilityActivationPolicy : uint8
 UCLASS()
 class WARRIORRPG_API UWarriorGameplayAbility : public UGameplayAbility
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	//~ Begin UGameplayAbility Interface
+    //~ Begin UGameplayAbility Interface
 
-	/**
-	 * Called by the engine when this ability is granted to an ASC.
-	 * Overridden to auto-activate the ability if the activation policy is OnGiven.
-	 */
-	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo,
-	                           const FGameplayAbilitySpec& Spec) override;
+    /**
+     * Called by the engine when this ability is granted to an ASC.
+     * Overridden to auto-activate the ability if the activation policy is OnGiven.
+     */
+    virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo,
+                               const FGameplayAbilitySpec& Spec) override;
 
-	/**
-	 * Called by the engine when this ability finishes execution.
-	 * Overridden to fully remove the ability from the ASC when its policy is OnGiven,
-	 * preventing it from persisting as a dormant spec that can never re-trigger.
-	 */
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle,
-	                        const FGameplayAbilityActorInfo* ActorInfo,
-	                        const FGameplayAbilityActivationInfo ActivationInfo,
-	                        bool bReplicateEndAbility,
-	                        bool bWasCancelled) override;
+    /**
+     * Called by the engine when this ability finishes execution.
+     * Overridden to fully remove the ability from the ASC when its policy is OnGiven,
+     * preventing it from persisting as a dormant spec that can never re-trigger.
+     */
+    virtual void EndAbility(const FGameplayAbilitySpecHandle Handle,
+                            const FGameplayAbilityActorInfo* ActorInfo,
+                            const FGameplayAbilityActivationInfo ActivationInfo,
+                            bool bReplicateEndAbility,
+                            bool bWasCancelled) override;
 
-	//~ End UGameplayAbility Interface
+    //~ End UGameplayAbility Interface
 
-	/**
-	 * Determines how this ability activates after being granted.
-	 * Defaults to OnTriggered (manual activation).
-	 * Set to OnGiven in Blueprint defaults for passive or always-on abilities.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		Category = "WarriorAbility")
-	EWarriorAbilityActivationPolicy AbilityActivationPolicy = EWarriorAbilityActivationPolicy::OnTriggered;
+    /**
+     * Determines how this ability activates after being granted.
+     * Defaults to OnTriggered (manual activation).
+     * Set to OnGiven in Blueprint defaults for passive or always-on abilities.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        Category = "WarriorAbility")
+    EWarriorAbilityActivationPolicy AbilityActivationPolicy = EWarriorAbilityActivationPolicy::OnTriggered;
 
-	/**
-	 * When true, this ability emits additional log output and on-screen debug messages.
-	 * Intended for development use — leave false in production ability assets.
-	 * Subclasses should gate verbose logging behind this flag using DebugHelper::Print
-	 * or conditional UE_LOG calls.
-	 */
-	UPROPERTY(EditDefaultsOnly,
-		BlueprintReadWrite,
-		Category = "Debug")
-	bool bDebugMode = false;
+    /**
+     * When true, this ability emits additional log output and on-screen debug messages.
+     * Intended for development use — leave false in production ability assets.
+     * Subclasses should gate verbose logging behind this flag using DebugHelper::Print
+     * or conditional UE_LOG calls.
+     */
+    UPROPERTY(EditDefaultsOnly,
+        BlueprintReadWrite,
+        Category = "Debug")
+    bool bDebugMode = false;
 
-	/**
-	 * Retrieves the PawnCombatComponent from the ability's avatar actor.
-	 * Provides abilities access to the combat component without knowing the concrete
-	 * character type — the ability only needs to know the avatar has a combat component.
-	 *
-	 * @return The avatar's UPawnCombatComponent, or nullptr if the avatar has none.
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|Gameplay Ability")
-	UPawnCombatComponent* GetPawnCombatComponentFromActorInfo() const;
+    /**
+     * Retrieves the PawnCombatComponent from the ability's avatar actor.
+     * Provides abilities access to the combat component without knowing the concrete
+     * character type — the ability only needs to know the avatar has a combat component.
+     *
+     * @return The avatar's UPawnCombatComponent, or nullptr if the avatar has none.
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|Gameplay Ability")
+    UPawnCombatComponent* GetPawnCombatComponentFromActorInfo() const;
 
-	/**
-	 * Retrieves the project-specific ASC from the ability's ActorInfo.
-	 * All WarriorRPG characters use UWarriorAbilitySystemComponent, so this cast is
-	 * guaranteed to succeed. Use when you need custom ASC functionality beyond the base class.
-	 *
-	 * @return The avatar's UWarriorAbilitySystemComponent.
-	 *         Crashes in development if the ASC is missing or of the wrong type —
-	 *         both cases indicate a serious character setup error.
-	 */
-	UFUNCTION(BlueprintPure,
-		Category = "Warrior|Ability")
-	UWarriorAbilitySystemComponent* GetWarriorAbilitySystemComponentFromActorInfo() const;
+    /**
+     * Retrieves the project-specific ASC from the ability's ActorInfo.
+     * All WarriorRPG characters use UWarriorAbilitySystemComponent, so this cast is
+     * guaranteed to succeed. Use when you need custom ASC functionality beyond the base class.
+     *
+     * @return The avatar's UWarriorAbilitySystemComponent.
+     *         Crashes in development if the ASC is missing or of the wrong type —
+     *         both cases indicate a serious character setup error.
+     */
+    UFUNCTION(BlueprintPure,
+        Category = "Warrior|Ability")
+    UWarriorAbilitySystemComponent* GetWarriorAbilitySystemComponentFromActorInfo() const;
 
-	/**
-	 * Applies the given GameplayEffect spec to the target actor's ASC.
-	 * Native (C++) variant — use from ability C++ code for performance.
-	 * Returns an invalid handle if the target has no ASC or the spec fails to apply.
-	 *
-	 * @param InTargetActor     The actor to apply the effect to. Must have an ASC.
-	 * @param InSpecHandle      The pre-built effect spec. Must be valid.
-	 * @return                  Handle to the active effect, or an invalid handle on failure.
-	 */
-	FActiveGameplayEffectHandle NativeApplyEffectSpecHandleToTarget(AActor* InTargetActor,
-	                                                                const FGameplayEffectSpecHandle& InSpecHandle);
+    /**
+     * Applies the given GameplayEffect spec to the target actor's ASC.
+     * Native (C++) variant — use from ability C++ code for performance.
+     * Returns an invalid handle if the target has no ASC or the spec fails to apply.
+     *
+     * @param InTargetActor     The actor to apply the effect to. Must have an ASC.
+     * @param InSpecHandle      The pre-built effect spec. Must be valid.
+     * @return                  Handle to the active effect, or an invalid handle on failure.
+     */
+    FActiveGameplayEffectHandle NativeApplyEffectSpecHandleToTarget(AActor* InTargetActor,
+                                                                    const FGameplayEffectSpecHandle& InSpecHandle);
 
-	/**
-	 * Blueprint-friendly wrapper over NativeApplyEffectSpecHandleToTarget.
-	 * ExpandEnumAsExecs converts OutSuccessType into Succeeded/Failed execution pins
-	 * so no Branch node is needed after calling this in Blueprint.
-	 *
-	 * @param InTargetActor     The actor to apply the effect to. Must have an ASC.
-	 * @param InSpecHandle      The pre-built effect spec. Must be valid.
-	 * @param OutSuccessType    Set to Succeeded if the effect was applied, Failed otherwise.
-	 * @return                  Handle to the active effect, or an invalid handle on failure.
-	 */
-	UFUNCTION(BlueprintCallable,
-		Category = "Warrior|Ability",
-		meta = (DisplayName = "Apply Gameplay Effect Spec Handle To Target Actor", ExpandEnumAsExecs = "OutSuccessType"
-		))
-	FActiveGameplayEffectHandle BP_ApplyEffectSpecHandleToTarget(AActor* InTargetActor,
-	                                                             const FGameplayEffectSpecHandle& InSpecHandle,
-	                                                             EWarriorSuccessType& OutSuccessType);
+    /**
+     * Blueprint-friendly wrapper over NativeApplyEffectSpecHandleToTarget.
+     * ExpandEnumAsExecs converts OutSuccessType into Succeeded/Failed execution pins
+     * so no Branch node is needed after calling this in Blueprint.
+     *
+     * @param InTargetActor     The actor to apply the effect to. Must have an ASC.
+     * @param InSpecHandle      The pre-built effect spec. Must be valid.
+     * @param OutSuccessType    Set to Succeeded if the effect was applied, Failed otherwise.
+     * @return                  Handle to the active effect, or an invalid handle on failure.
+     */
+    UFUNCTION(BlueprintCallable,
+        Category = "Warrior|Ability",
+        meta = (DisplayName = "Apply Gameplay Effect Spec Handle To Target Actor", ExpandEnumAsExecs = "OutSuccessType" ))
+    FActiveGameplayEffectHandle BP_ApplyEffectSpecHandleToTarget(AActor* InTargetActor,
+                                                                 const FGameplayEffectSpecHandle& InSpecHandle,
+                                                                 EWarriorSuccessType& OutSuccessType);
 };

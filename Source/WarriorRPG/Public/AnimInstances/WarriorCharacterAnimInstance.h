@@ -24,50 +24,50 @@ class AWarriorBaseCharacter;
 UCLASS()
 class WARRIORRPG_API UWarriorCharacterAnimInstance : public UWarriorBaseAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	//~ Begin UAnimInstance Interface
-	virtual void NativeInitializeAnimation() override;
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
-	//~ End UAnimInstance Interface
+    //~ Begin UAnimInstance Interface
+    virtual void NativeInitializeAnimation() override;
+    virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+    virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
+    //~ End UAnimInstance Interface
 
 protected:
-	/** Cached reference to the owning WarriorBaseCharacter. Set once during initialization. */
-	UPROPERTY()
-	TObjectPtr<AWarriorBaseCharacter> OwningCharacter;
+    /** Cached reference to the owning WarriorBaseCharacter. Set once during initialization. */
+    UPROPERTY()
+    TObjectPtr<AWarriorBaseCharacter> OwningCharacter;
 
-	/** Cached reference to the owning character's movement component for efficient per-frame access. */
-	UPROPERTY()
-	TObjectPtr<UCharacterMovementComponent> OwningMovementComponent;
+    /** Cached reference to the owning character's movement component for efficient per-frame access. */
+    UPROPERTY()
+    TObjectPtr<UCharacterMovementComponent> OwningMovementComponent;
 
-	/**
-	 * Current horizontal movement speed of the character (ignores vertical velocity).
-	 * Used in the AnimGraph to blend between idle, walk, and run states.
-	 */
-	UPROPERTY(VisibleDefaultsOnly,
-		BlueprintReadOnly,
-		Category = "AnimData|LocomotionData")
-	float GroundSpeed;
+    /**
+     * Current horizontal movement speed of the character (ignores vertical velocity).
+     * Used in the AnimGraph to blend between idle, walk, and run states.
+     */
+    UPROPERTY(VisibleDefaultsOnly,
+        BlueprintReadOnly,
+        Category = "AnimData|LocomotionData")
+    float GroundSpeed;
 
-	/**
-	 * Whether the character is currently accelerating (has movement input).
-	 * Used to distinguish between actively moving and decelerating/sliding to a stop.
-	 */
-	UPROPERTY(VisibleDefaultsOnly,
-		BlueprintReadOnly,
-		Category = "AnimData|LocomotionData")
-	bool bHasAcceleration;
+    /**
+     * Whether the character is currently accelerating (has movement input).
+     * Used to distinguish between actively moving and decelerating/sliding to a stop.
+     */
+    UPROPERTY(VisibleDefaultsOnly,
+        BlueprintReadOnly,
+        Category = "AnimData|LocomotionData")
+    bool bHasAcceleration;
 
-	/**
-	 * The locomotion direction angle of the character in degrees relative to its facing direction.
-	 * Computed via UKismetAnimationLibrary::CalculateDirection from velocity and actor rotation.
-	 * Used in the AnimGraph to drive strafe blendspaces — positive values indicate rightward
-	 * movement, negative values indicate leftward movement.
-	 */
-	UPROPERTY(VisibleDefaultsOnly,
-		BlueprintReadOnly,
-		Category = "AnimData|LocomotionData")
-	float LocomotionDirection;
+    /**
+     * The locomotion direction angle of the character in degrees relative to its facing direction.
+     * Computed via UKismetAnimationLibrary::CalculateDirection from velocity and actor rotation.
+     * Used in the AnimGraph to drive strafe blendspaces — positive values indicate rightward
+     * movement, negative values indicate leftward movement.
+     */
+    UPROPERTY(VisibleDefaultsOnly,
+        BlueprintReadOnly,
+        Category = "AnimData|LocomotionData")
+    float LocomotionDirection;
 };

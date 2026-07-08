@@ -10,50 +10,49 @@
 
 AWarriorEnemyCharacter* UWarriorEnemyGameplayAbility::GetEnemyCharacterFromActorInfo()
 {
-	if (!CachedWarriorEnemyCharacter.IsValid())
-	{
-		CachedWarriorEnemyCharacter = Cast<AWarriorEnemyCharacter>(CurrentActorInfo->AvatarActor);
-		check(CachedWarriorEnemyCharacter.IsValid());
-	}
+    if (!CachedWarriorEnemyCharacter.IsValid())
+    {
+        CachedWarriorEnemyCharacter = Cast<AWarriorEnemyCharacter>(CurrentActorInfo->AvatarActor);
+        check(CachedWarriorEnemyCharacter.IsValid());
+    }
 
-	return CachedWarriorEnemyCharacter.Get();
+    return CachedWarriorEnemyCharacter.Get();
 }
 
 UEnemyCombatComponent* UWarriorEnemyGameplayAbility::GetEnemyCombatComponentFromActorInfo()
 {
-	AWarriorEnemyCharacter* EnemyCharacter = GetEnemyCharacterFromActorInfo();
-	check(EnemyCharacter);
+    AWarriorEnemyCharacter* EnemyCharacter = GetEnemyCharacterFromActorInfo();
+    check(EnemyCharacter);
 
-	UEnemyCombatComponent* CombatComponent = EnemyCharacter->GetEnemyCombatComponent();
-	check(CombatComponent);
+    UEnemyCombatComponent* CombatComponent = EnemyCharacter->GetEnemyCombatComponent();
+    check(CombatComponent);
 
-	return CombatComponent;
+    return CombatComponent;
 }
 
-FGameplayEffectSpecHandle UWarriorEnemyGameplayAbility::MakeEnemyDamageEffectSpecHandle(
-	TSubclassOf<UGameplayEffect> EffectClass,
-	const FScalableFloat& InDamageScalableFloat)
+FGameplayEffectSpecHandle UWarriorEnemyGameplayAbility::MakeEnemyDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> EffectClass,
+                                                                                        const FScalableFloat& InDamageScalableFloat)
 {
-	check(EffectClass);
+    check(EffectClass);
 
-	AActor* AvatarActor = GetAvatarActorFromActorInfo();
-	check(AvatarActor);
+    AActor* AvatarActor = GetAvatarActorFromActorInfo();
+    check(AvatarActor);
 
-	UWarriorAbilitySystemComponent* WarriorASC = GetWarriorAbilitySystemComponentFromActorInfo();
-	check(WarriorASC);
+    UWarriorAbilitySystemComponent* WarriorASC = GetWarriorAbilitySystemComponentFromActorInfo();
+    check(WarriorASC);
 
-	FGameplayEffectContextHandle ContextHandle = WarriorASC->MakeEffectContext();
-	ContextHandle.SetAbility(this);
-	ContextHandle.AddSourceObject(AvatarActor);
-	ContextHandle.AddInstigator(AvatarActor,
-	                            AvatarActor);
+    FGameplayEffectContextHandle ContextHandle = WarriorASC->MakeEffectContext();
+    ContextHandle.SetAbility(this);
+    ContextHandle.AddSourceObject(AvatarActor);
+    ContextHandle.AddInstigator(AvatarActor,
+                                AvatarActor);
 
-	FGameplayEffectSpecHandle EffectSpecHandle = WarriorASC->MakeOutgoingSpec(EffectClass,
-	                                                                          GetAbilityLevel(),
-	                                                                          ContextHandle);
+    FGameplayEffectSpecHandle EffectSpecHandle = WarriorASC->MakeOutgoingSpec(EffectClass,
+                                                                              GetAbilityLevel(),
+                                                                              ContextHandle);
 
-	EffectSpecHandle.Data->SetSetByCallerMagnitude(WarriorRPGTags::Shared::SetByCaller::BaseDamage,
-	                                               InDamageScalableFloat.GetValueAtLevel(GetAbilityLevel()));
+    EffectSpecHandle.Data->SetSetByCallerMagnitude(WarriorRPGTags::Shared::SetByCaller::BaseDamage,
+                                                   InDamageScalableFloat.GetValueAtLevel(GetAbilityLevel()));
 
-	return EffectSpecHandle;
+    return EffectSpecHandle;
 }

@@ -29,27 +29,28 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquippedWeaponChangedDelegate,
  * widgets bind to them directly without polling or ticking.
  */
 UCLASS(ClassGroup=(Custom),
-	meta=(BlueprintSpawnableComponent))
+    meta=(BlueprintSpawnableComponent))
 class WARRIORRPG_API UHeroUIComponent : public UPawnUIComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/**
-	 * Broadcast by the attribute set whenever CurrentRage changes.
-	 * The value is pre-normalized — listeners receive CurrentRage / MaxRage in [0, 1].
-	 * Bind to this in the rage bar widget to update without polling.
-	 * Only broadcast for hero characters — enemies do not have a rage attribute.
-	 */
-	UPROPERTY(BlueprintAssignable)
-	FOnPercentChangedDelegate OnCurrentRageChanged;
+    /**
+     * Broadcast by the attribute set whenever CurrentRage changes.
+     * The value is pre-normalized — listeners receive CurrentRage / MaxRage in [0, 1].
+     * Bind to this in the rage bar widget to update without polling.
+     * Only broadcast for hero characters — enemies do not have a rage attribute.
+     */
+    UPROPERTY(BlueprintAssignable)
+    FOnPercentChangedDelegate OnCurrentRageChanged;
 
-	/**
-	 * Broadcast when the hero equips a new weapon.
-	 * Carries a soft reference to the weapon icon texture so the HUD widget
-	 * can update the displayed weapon image without knowing the concrete weapon type.
-	 * The widget is responsible for async-loading the texture before displaying it.
-	 */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FOnEquippedWeaponChangedDelegate OnEquippedWeaponChanged;
+    /**
+     * Broadcast when the hero equips a new weapon.
+     * Carries a soft reference to the weapon icon texture so the HUD widget
+     * can update the displayed weapon image without knowing the concrete weapon type.
+     * The widget is responsible for async-loading the texture before displaying it.
+     */
+    UPROPERTY(BlueprintAssignable,
+        BlueprintCallable)
+    FOnEquippedWeaponChangedDelegate OnEquippedWeaponChanged;
 };
