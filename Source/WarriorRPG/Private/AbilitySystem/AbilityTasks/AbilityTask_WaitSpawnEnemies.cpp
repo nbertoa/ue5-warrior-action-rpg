@@ -29,6 +29,13 @@ void UAbilityTask_WaitSpawnEnemies::Activate()
     // Register directly on the ASC's generic event map instead of using
     // UAbilityTask_WaitGameplayEvent, because we need to chain into an async
     // load before spawning — a single WaitGameplayEvent node cannot express that.
+    if (!ensureMsgf(AbilitySystemComponent.Get(),
+                    TEXT("[UAbilityTask_WaitSpawnEnemies] Activate — AbilitySystemComponent is null. " "The task cannot register its event delegate.")))
+    {
+        EndTask();
+        return;
+    }
+
     FGameplayEventMulticastDelegate& Delegate = AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(CachedEventTag);
 
     DelegateHandle = Delegate.AddUObject(this,
@@ -39,9 +46,12 @@ void UAbilityTask_WaitSpawnEnemies::OnDestroy(bool bInOwnerFinished)
 {
     // Always unregister before the task is garbage collected — otherwise the
     // callback can fire on a destroyed UObject if the ASC outlives this task.
-    FGameplayEventMulticastDelegate& Delegate = AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(CachedEventTag);
+    if (AbilitySystemComponent.Get())
+    {
+        FGameplayEventMulticastDelegate& Delegate = AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(CachedEventTag);
 
-    Delegate.Remove(DelegateHandle);
+        Delegate.Remove(DelegateHandle);
+    }
 
     Super::OnDestroy(bInOwnerFinished);
 }
@@ -71,13 +81,54 @@ void UAbilityTask_WaitSpawnEnemies::OnGameplayEventReceived(const FGameplayEvent
 
 void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
 {
-    UClass* LoadedClass = CachedSoftEnemyClassToSpawn.Get();
     UWorld* World = GetWorld();
 
-    // Both checks are required: LoadedClass can be null if the asset failed to load,
-    // and World can be null if the level was unloaded between the async request and
-    // this callback (e.g., during PIE stop or a level transition).
-    if (!LoadedClass || !World)
+    // World can be null if the level was unloaded between the async load request
+    // and this callback (e.g., during a level transition or PIE stop).
+    if (!ensureMsgf(World,
+                    TEXT("[UAbilityTask_WaitSpawnEnemies] OnEnemyClassLoaded — World is null. " "The level may have been unloaded during the async load.")))
+    {
+        if (ShouldBroadcastAbilityTaskDelegates())
+        {
+            DidNotSpawn.Broadcast(TArray<AWarriorEnemyCharacter*>());
+        }
+
+        EndTask();
+        return;
+    }
+
+    UClass* LoadedClass = CachedSoftEnemyClassToSpawn.Get();
+
+    // LoadedClass can be null if the asset failed to load or was unloaded
+    // between the RequestAsyncLoad call and this callback.
+    if (!ensureMsgf(LoadedClass,
+                    TEXT("[UAbilityTask_WaitSpawnEnemies] OnEnemyClassLoaded — LoadedClass is null. " "The enemy asset may have failed to load.")))
+    {
+        if (ShouldBroadcastAbilityTaskDelegates())
+        {
+            DidNotSpawn.Broadcast(TArray<AWarriorEnemyCharacter*>());
+        }
+
+        EndTask();
+        return;
+    }
+
+    if (!ensureMsgf(AbilitySystemComponent.Get(),
+                    TEXT("[UAbilityTask_WaitSpawnEnemies] OnEnemyClassLoaded — AbilitySystemComponent " "is null. The ASC may have been destroyed during the async load.")))
+    {
+        if (ShouldBroadcastAbilityTaskDelegates())
+        {
+            DidNotSpawn.Broadcast(TArray<AWarriorEnemyCharacter*>());
+        }
+
+        EndTask();
+        return;
+    }
+
+    AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
+
+    if (!ensureMsgf(IsValid(AvatarActor),
+                    TEXT("[UAbilityTask_WaitSpawnEnemies] OnEnemyClassLoaded — AvatarActor is null " "or pending kill. Cannot determine spawn facing rotation.")))
     {
         if (ShouldBroadcastAbilityTaskDelegates())
         {
@@ -93,6 +144,10 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
     FActorSpawnParameters SpawnParam;
     SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
+    // Cache the facing rotation once — all enemies spawned in this batch
+    // face the same direction as the summoner at the moment of summoning.
+    const FRotator SpawnFacingRotation = AvatarActor->GetActorForwardVector().ToOrientationRotator();
+
     for (int32 i = 0; i < CachedNumToSpawn; i++)
     {
         FVector RandomLocation;
@@ -107,8 +162,6 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
                                   0.0f,
                                   150.0f);
 
-        const FRotator SpawnFacingRotation = AbilitySystemComponent->GetAvatarActor()->GetActorForwardVector().ToOrientationRotator();
-
         AWarriorEnemyCharacter* SpawnedEnemy = World->SpawnActor<AWarriorEnemyCharacter>(LoadedClass,
                                                                                          RandomLocation,
                                                                                          SpawnFacingRotation,
@@ -116,9 +169,9 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
 
         // SpawnActor can return nullptr in edge cases even with AdjustIfPossibleButAlwaysSpawn:
         // invalid NavMesh location, extreme geometry overlap, or level teardown between the
-        // async load and this callback. A hard check here would crash the game in those
-        // scenarios and leave already-spawned enemies orphaned with EndTask never called.
-        // Skip the failed slot, log it, and let the array-empty check below handle broadcast.
+        // async load and this callback. Skip the failed slot and let the array-empty check
+        // below handle the broadcast — a hard check here would crash and leave already-spawned
+        // enemies orphaned with EndTask never called.
         if (!ensureMsgf(IsValid(SpawnedEnemy),
                         TEXT("[UAbilityTask_WaitSpawnEnemies] SpawnActor returned null " "for class [%s] at index %d. NavMesh location or collision may be invalid."),
                         *LoadedClass->GetName(),
