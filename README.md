@@ -20,6 +20,18 @@ Built following the [Unreal Engine 5 C++: Advanced Action RPG](https://www.udemy
 
 ---
 
+## Documentation
+
+The README describes the architecture. Use these practical guides when configuring
+or extending the project in Unreal Editor:
+
+- [Project setup](docs/setup.md) - required project settings, C++/Blueprint pairings, and validation.
+- [Gameplay Ability System](docs/gameplay-ability-system.md) - attributes, tags, abilities, effects, and input routing.
+- [Networking](docs/networking.md) - authority rules for combat, projectiles, and enemy spawning.
+- [Contributing](docs/contributing.md) - code conventions and local verification commands.
+
+---
+
 ## Architecture Overview
 
 ### Character Hierarchy
@@ -173,6 +185,8 @@ AActor
 ### Enemy Summon System (`UAbilityTask_WaitSpawnEnemies`)
 
 Custom ability task that listens for a Gameplay Event and asynchronously spawns a configurable number of `AWarriorEnemyCharacter` instances at random NavMesh-reachable locations around a given origin. The asset load is fully async via `UAssetManager`. Failed individual spawn slots are skipped with `ensureMsgf` + `continue` rather than a hard crash, and the `DidNotSpawn` delegate broadcasts if the entire spawn run produces zero valid enemies.
+
+Each task instance consumes only its first trigger event. Spawning is server-authoritative; clients do not create local enemy actors. A valid reachable NavMesh point is required for every spawn slot.
 
 ### AI System
 
