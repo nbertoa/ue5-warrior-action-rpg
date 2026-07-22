@@ -141,7 +141,10 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
         //                   BaseDamage);
     }
 
-    const float FinalDamageDone = BaseDamage * SourceAttackPower / TargetDefensePower;
+    // Defense is initialized to 1, but a malformed or incomplete initialization
+    // effect can still leave it at zero. Clamp the divisor to avoid Inf/NaN damage.
+    const float SafeTargetDefensePower = FMath::Max(TargetDefensePower, 1.0f);
+    const float FinalDamageDone = BaseDamage * SourceAttackPower / SafeTargetDefensePower;
     //DebugHelper::Print(TEXT("FinalDamageDone"),
     //                   FinalDamageDone);
 

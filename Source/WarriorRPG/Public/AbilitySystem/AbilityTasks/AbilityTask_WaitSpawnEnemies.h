@@ -85,6 +85,10 @@ private:
      *  preventing callbacks from firing after the task has ended. */
     FDelegateHandle DelegateHandle;
 
+    /** Ensures one task instance creates at most one spawn batch even if the
+     *  triggering gameplay event is sent repeatedly while the class is loading. */
+    bool bSpawnTriggered = false;
+
     /** Callback registered on the ASC for CachedEventTag.
      *  Triggers the async load of the enemy class when the event fires. */
     void OnGameplayEventReceived(const FGameplayEventData* InPayload);

@@ -28,9 +28,22 @@ AWarriorAIController::AWarriorAIController(const FObjectInitializer& ObjectIniti
 ETeamAttitude::Type AWarriorAIController::GetTeamAttitudeTowards(const AActor& Other) const
 {
     const APawn* PawnToCheck = Cast<const APawn>(&Other);
+    if (!PawnToCheck)
+    {
+        return ETeamAttitude::Neutral;
+    }
 
-    const IGenericTeamAgentInterface* OtherTeamAgent = Cast<IGenericTeamAgentInterface>(PawnToCheck->GetController());
-    check(OtherTeamAgent);
+    const AController* OtherController = PawnToCheck->GetController();
+    if (!OtherController)
+    {
+        return ETeamAttitude::Neutral;
+    }
+
+    const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(OtherController);
+    if (!OtherTeamAgent)
+    {
+        return ETeamAttitude::Neutral;
+    }
 
     return OtherTeamAgent->GetGenericTeamId() < GetGenericTeamId() ? ETeamAttitude::Hostile : ETeamAttitude::Friendly;
 }

@@ -122,7 +122,19 @@ void AWarriorProjectileBase::OnProjectileBeginOverlap(UPrimitiveComponent* Overl
                                                       UPrimitiveComponent* OtherComp,
                                                       int32 OtherBodyIndex,
                                                       bool bFromSweep,
-                                                      const FHitResult& SweepResult) {}
+                                                      const FHitResult& SweepResult)
+{
+    if (ProjectileDamagePolicy == EProjectileDamagePolicy::OnBeginOverlap)
+    {
+        // Reuse the hit path so overlap and blocking projectiles share the
+        // same team, block, damage and destruction rules.
+        OnProjectileHit(OverlappedComponent,
+                        OtherActor,
+                        OtherComp,
+                        FVector::ZeroVector,
+                        SweepResult);
+    }
+}
 
 void AWarriorProjectileBase::HandleApplyProjectileDamage(APawn* InInstigatorPawn,
                                                          APawn* InHitPawn,

@@ -26,6 +26,13 @@ void UHeroGameplayAbility_TargetLock::ActivateAbility(const FGameplayAbilitySpec
     // if no target is found, CancelTargetLockAbility cancels before Super runs.
     TryLockOnTarget();
 
+    // TryLockOnTarget cancels the ability when no valid target exists. Do not
+    // alter movement or install an input context after that cancellation.
+    if (!CurrentLockedActor)
+    {
+        return;
+    }
+
     InitTargetLockMovement();
 
     InitTargetLockMappingContext();

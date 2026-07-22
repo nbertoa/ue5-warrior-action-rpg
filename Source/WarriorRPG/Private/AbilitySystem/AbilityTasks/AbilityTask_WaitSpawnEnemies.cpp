@@ -48,9 +48,10 @@ void UAbilityTask_WaitSpawnEnemies::OnDestroy(bool bInOwnerFinished)
     // callback can fire on a destroyed UObject if the ASC outlives this task.
     if (AbilitySystemComponent.Get())
     {
-        FGameplayEventMulticastDelegate& Delegate = AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(CachedEventTag);
-
-        Delegate.Remove(DelegateHandle);
+        if (FGameplayEventMulticastDelegate* Delegate = AbilitySystemComponent->GenericGameplayEventCallbacks.Find(CachedEventTag))
+        {
+            Delegate->Remove(DelegateHandle);
+        }
     }
 
     Super::OnDestroy(bInOwnerFinished);
@@ -58,6 +59,13 @@ void UAbilityTask_WaitSpawnEnemies::OnDestroy(bool bInOwnerFinished)
 
 void UAbilityTask_WaitSpawnEnemies::OnGameplayEventReceived(const FGameplayEventData* InPayload)
 {
+    if (bSpawnTriggered)
+    {
+        return;
+    }
+
+    bSpawnTriggered = true;
+
     if (ensure(!CachedSoftEnemyClassToSpawn.IsNull()))
     {
         // Kick off an async load — the class may not be in memory yet.
@@ -87,6 +95,20 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
     // and this callback (e.g., during a level transition or PIE stop).
     if (!ensureMsgf(World,
                     TEXT("[UAbilityTask_WaitSpawnEnemies] OnEnemyClassLoaded — World is null. " "The level may have been unloaded during the async load.")))
+    {
+        if (ShouldBroadcastAbilityTaskDelegates())
+        {
+            DidNotSpawn.Broadcast(TArray<AWarriorEnemyCharacter*>());
+        }
+
+        EndTask();
+        return;
+    }
+
+    // Actor spawning is authoritative in Unreal. A client-side task may still
+    // receive the event for prediction, but must never create non-replicated
+    // enemies locally.
+    if (World->GetNetMode() == NM_Client)
     {
         if (ShouldBroadcastAbilityTaskDelegates())
         {
@@ -150,11 +172,20 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
 
     for (int32 i = 0; i < CachedNumToSpawn; i++)
     {
-        FVector RandomLocation;
-        UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this,
-                                                                CachedSpawnOrigin,
-                                                                RandomLocation,
-                                                                CachedRandomSpawnRadius);
+        FVector RandomLocation = FVector::ZeroVector;
+        const bool bFoundReachableLocation = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this,
+                                                                                                     CachedSpawnOrigin,
+                                                                                                     RandomLocation,
+                                                                                                     CachedRandomSpawnRadius);
+
+        if (!bFoundReachableLocation)
+        {
+            UE_LOG(LogTemp,
+                   Warning,
+                   TEXT("[UAbilityTask_WaitSpawnEnemies] No reachable NavMesh location found at index %d."),
+                   i);
+            continue;
+        }
 
         // Offset upward so the enemy spawns above the ground and falls into place,
         // avoiding cases where the capsule starts inside the floor geometry.
