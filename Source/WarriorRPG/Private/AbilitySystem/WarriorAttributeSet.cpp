@@ -15,6 +15,19 @@
 #include "Utils/WarriorRPGTags.h"
 #include "WarriorFunctionLibrary.h"
 
+namespace
+{
+    float GetNormalizedAttributeValue(float CurrentValue,
+                                      float MaxValue)
+    {
+        const float SafeMaxValue = FMath::Max(MaxValue,
+                                              0.0f);
+        return SafeMaxValue > 0.0f ? FMath::Clamp(CurrentValue / SafeMaxValue,
+                                                  0.0f,
+                                                  1.0f) : 0.0f;
+    }
+}
+
 UWarriorAttributeSet::UWarriorAttributeSet()
 {
     // All persistent attributes start at 1.0f as a safe non-zero baseline.
@@ -70,24 +83,33 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
     // Clamp CurrentHealth after any direct modification (e.g. a heal GE that adds directly
     // to CurrentHealth). DamageTaken-based damage is handled separately below — this block
     // only applies when CurrentHealth itself is the modified attribute.
-    if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
+    if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute() || Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
     {
+        const float SafeMaxHealth = FMath::Max(GetMaxHealth(),
+                                               0.0f);
+        SetMaxHealth(SafeMaxHealth);
+
         const float NewCurrentHealth = FMath::Clamp(GetCurrentHealth(),
                                                     0.0f,
-                                                    GetMaxHealth());
+                                                    SafeMaxHealth);
 
         SetCurrentHealth(NewCurrentHealth);
 
         // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
-        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetCurrentHealth() / GetMaxHealth());
+        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                      SafeMaxHealth));
     }
 
     // Clamp CurrentRage after any direct modification, same rationale as CurrentHealth above.
-    if (Data.EvaluatedData.Attribute == GetCurrentRageAttribute())
+    if (Data.EvaluatedData.Attribute == GetCurrentRageAttribute() || Data.EvaluatedData.Attribute == GetMaxRageAttribute())
     {
+        const float SafeMaxRage = FMath::Max(GetMaxRage(),
+                                             0.0f);
+        SetMaxRage(SafeMaxRage);
+
         const float NewCurrentRage = FMath::Clamp(GetCurrentRage(),
                                                   0.0f,
-                                                  GetMaxRage());
+                                                  SafeMaxRage);
 
         SetCurrentRage(NewCurrentRage);
 
@@ -95,7 +117,8 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
         // Enemy characters return nullptr from GetHeroUIComponent() by design.
         if (UHeroUIComponent* HeroUIComponent = CachedPawnUIInterface->GetHeroUIComponent())
         {
-            HeroUIComponent->OnCurrentRageChanged.Broadcast(GetCurrentRage() / GetMaxRage());
+            HeroUIComponent->OnCurrentRageChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentRage,
+                                                                                        SafeMaxRage));
         }
     }
 
@@ -103,6 +126,8 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
     {
         const float OldHealth = GetCurrentHealth();
         const float DamageDone = GetDamageTaken();
+        const float SafeMaxHealth = FMath::Max(GetMaxHealth(),
+                                               0.0f);
 
         // Reset immediately — DamageTaken must be zero between GE applications.
         // Leaving a stale value would corrupt the next ExecCalc capture for this attribute.
@@ -110,7 +135,7 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
 
         const float NewCurrentHealth = FMath::Clamp(OldHealth - DamageDone,
                                                     0.0f,
-                                                    GetMaxHealth());
+                                                    SafeMaxHealth);
 
         SetCurrentHealth(NewCurrentHealth);
 
@@ -123,7 +148,8 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
         //                   FColor::Green);
 
         // Normalize to [0, 1] before broadcasting — same pattern as the direct health block above.
-        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetCurrentHealth() / GetMaxHealth());
+        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                      SafeMaxHealth));
 
         // FMath::IsNearlyZero instead of == 0.0f: floating point arithmetic can produce
         // values like -0.000001f after clamping, which would cause == 0.0f to never fire.
