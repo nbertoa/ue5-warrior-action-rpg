@@ -80,24 +80,50 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
            TEXT("Couldn't extract a PawnUIComponent from %s"),
            *AvatarActor->GetActorNameOrLabel());
 
-    // Clamp CurrentHealth after any direct modification (e.g. a heal GE that adds directly
-    // to CurrentHealth). DamageTaken-based damage is handled separately below — this block
-    // only applies when CurrentHealth itself is the modified attribute.
-    if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute() || Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
+    // MaxHealth and CurrentHealth are handled separately because an initialization GE
+    // commonly modifies both attributes. Broadcasting unconditionally from both executions
+    // would notify the UI twice while the enemy is being initialized.
+    if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
     {
+        // MaxHealth must never be negative. A negative maximum would make the valid
+        // CurrentHealth range impossible and would invalidate percentage calculations.
         const float SafeMaxHealth = FMath::Max(GetMaxHealth(),
                                                0.0f);
         SetMaxHealth(SafeMaxHealth);
 
-        const float NewCurrentHealth = FMath::Clamp(GetCurrentHealth(),
+        // A lower MaxHealth may leave CurrentHealth outside its new valid range.
+        // Preserve the current value when possible and clamp only when required.
+        const float OldCurrentHealth = GetCurrentHealth();
+        const float NewCurrentHealth = FMath::Clamp(OldCurrentHealth,
                                                     0.0f,
                                                     SafeMaxHealth);
+
+        // Notify listeners only when the MaxHealth change also forced CurrentHealth
+        // to change. This suppresses the redundant initialization broadcast while
+        // still keeping the UI synchronized when health is clamped by a lower maximum.
+        if (!FMath::IsNearlyEqual(OldCurrentHealth,
+                                  NewCurrentHealth))
+        {
+            SetCurrentHealth(NewCurrentHealth);
+
+            // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
+            PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                          SafeMaxHealth));
+        }
+    }
+    else if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
+    {
+        // Direct CurrentHealth modifiers include initialization and healing effects.
+        // Clamp their result before exposing the normalized value to UI listeners.
+        const float NewCurrentHealth = FMath::Clamp(GetCurrentHealth(),
+                                                    0.0f,
+                                                    GetMaxHealth());
 
         SetCurrentHealth(NewCurrentHealth);
 
         // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
         PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
-                                                                                      SafeMaxHealth));
+                                                                                      GetMaxHealth()));
     }
 
     // Clamp CurrentRage after any direct modification, same rationale as CurrentHealth above.
