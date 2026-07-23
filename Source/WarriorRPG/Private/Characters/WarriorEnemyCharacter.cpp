@@ -152,12 +152,19 @@ void AWarriorEnemyCharacter::OnBodyCollisionBoxBeginOverlap(UPrimitiveComponent*
 
 void AWarriorEnemyCharacter::InitEnemyStartupData()
 {
+    if (bStartupDataApplied || bStartupDataLoadInFlight)
+    {
+        return;
+    }
+
     if (!ensureMsgf(!CharacterStartupData.IsNull(),
                     TEXT("[AWarriorEnemyCharacter] CharacterStartupData is null on %s — " "assign it in the Blueprint defaults."),
                     *GetName()))
     {
         return;
     }
+
+    bStartupDataLoadInFlight = true;
 
     // Async load keeps the game thread unblocked — the callback fires as soon
     // as the asset is ready, which is typically within the same frame on a warm cache.
@@ -168,9 +175,17 @@ void AWarriorEnemyCharacter::InitEnemyStartupData()
 
 void AWarriorEnemyCharacter::OnStartupDataLoaded()
 {
+    bStartupDataLoadInFlight = false;
+
+    if (bStartupDataApplied)
+    {
+        return;
+    }
+
     if (UDataAsset_StartupDataBase* LoadedData = CharacterStartupData.Get())
     {
         LoadedData->GiveToAbilitySystemComponent(WarriorAbilitySystemComponent);
+        bStartupDataApplied = true;
 
         UE_LOG(LogWarriorRPG,
                Log,

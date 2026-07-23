@@ -181,6 +181,11 @@ void AWarriorHeroCharacter::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
 
+    if (bStartupDataApplied)
+    {
+        return;
+    }
+
     // If the designer didn't assign startup data, skip gracefully.
     // The base class already warned via ensureMsgf — no need to log again.
     if (CharacterStartupData.IsNull())
@@ -201,6 +206,7 @@ void AWarriorHeroCharacter::PossessedBy(AController* NewController)
 
     // Hand off to the data asset — it grants every configured ability to the ASC.
     LoadedData->GiveToAbilitySystemComponent(WarriorAbilitySystemComponent);
+    bStartupDataApplied = true;
 }
 
 void AWarriorHeroCharacter::Input_Move(const FInputActionValue& InputActionValue)

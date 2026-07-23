@@ -193,6 +193,15 @@ protected:
                                                 const FHitResult& SweepResult);
 
 private:
+    // Startup data belongs to this ASC instance and must not be granted again
+    // when the same pawn is re-possessed.
+    UPROPERTY(Transient)
+    bool bStartupDataApplied = false;
+
+    // Avoid queueing duplicate async loads during rapid re-possession.
+    UPROPERTY(Transient)
+    bool bStartupDataLoadInFlight = false;
+
     /** Asynchronously loads CharacterStartupData and grants all startup
      *  abilities and attributes to the enemy's ASC. Called from PossessedBy. */
     void InitEnemyStartupData();

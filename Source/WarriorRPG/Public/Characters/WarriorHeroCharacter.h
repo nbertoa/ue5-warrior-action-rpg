@@ -184,4 +184,9 @@ private:
     void Input_GameplayAbilityInputReleased(FGameplayTag InInputTag);
 
 #pragma endregion
+
+    // Startup data belongs to this ASC instance and must not be granted again
+    // when the same pawn is re-possessed.
+    UPROPERTY(Transient)
+    bool bStartupDataApplied = false;
 };
