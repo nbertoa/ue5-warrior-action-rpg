@@ -231,6 +231,12 @@ bool UWarriorFunctionLibrary::ApplyGameplayEffectSpecHandleToTargetActor(AActor*
                                                                          AActor* InTargetActor,
                                                                          const FGameplayEffectSpecHandle& InSpecHandle)
 {
+    if (!ensureMsgf(InSpecHandle.IsValid(),
+                    TEXT("UWarriorFunctionLibrary::ApplyGameplayEffectSpecHandleToTargetActor received an invalid Gameplay Effect spec handle.")))
+    {
+        return false;
+    }
+
     // Both ASCs are treated as recoverable configuration errors, not programming
     // invariants — this function is BlueprintCallable and reachable from designer
     // graphs, where passing an actor without an ASC is a plausible authoring mistake
