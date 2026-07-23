@@ -125,24 +125,40 @@ TSubclassOf<UWarriorActivatableWidget> UWarriorFunctionLibrary::GetWidgetClassBy
 bool UWarriorFunctionLibrary::IsTargetPawnHostile(APawn* QueryPawn,
                                                   APawn* TargetPawn)
 {
-    check(QueryPawn);
-    check(TargetPawn);
+    if (!ensureMsgf(IsValid(QueryPawn) && IsValid(TargetPawn),
+                    TEXT("UWarriorFunctionLibrary::IsTargetPawnHostile requires valid query and target pawns.")))
+    {
+        return false;
+    }
 
     // Team affiliation is stored on the controller, not the pawn — the pawn is
     // a physical representation while the controller owns the decision-making identity.
     // Hero controller uses team ID 0; enemy AI controllers use team ID 1.
     // Any mismatch in team IDs means the pawns are on opposing factions.
     AController* QueryPawnController = QueryPawn->GetController();
-    check(QueryPawnController);
 
     AController* TargetPawnController = TargetPawn->GetController();
-    check(TargetPawnController);
+    if (!ensureMsgf(QueryPawnController && TargetPawnController,
+                    TEXT("UWarriorFunctionLibrary::IsTargetPawnHostile cannot evaluate unpossessed pawns. Query=[%s], Target=[%s]."),
+                    *GetNameSafe(QueryPawn),
+                    *GetNameSafe(TargetPawn)))
+    {
+        return false;
+    }
 
     // CastChecked: both controllers must implement IGenericTeamAgentInterface —
     // failing here means a controller was not set up with team affiliation,
     // which is always a project configuration error.
-    const IGenericTeamAgentInterface* QueryTeamAgent = CastChecked<IGenericTeamAgentInterface>(QueryPawnController);
-    const IGenericTeamAgentInterface* TargetTeamAgent = CastChecked<IGenericTeamAgentInterface>(TargetPawnController);
+    const IGenericTeamAgentInterface* QueryTeamAgent = Cast<IGenericTeamAgentInterface>(QueryPawnController);
+    const IGenericTeamAgentInterface* TargetTeamAgent = Cast<IGenericTeamAgentInterface>(TargetPawnController);
+
+    if (!ensureMsgf(QueryTeamAgent && TargetTeamAgent,
+                    TEXT("UWarriorFunctionLibrary::IsTargetPawnHostile requires controllers that implement IGenericTeamAgentInterface. Query=[%s], Target=[%s]."),
+                    *GetNameSafe(QueryPawnController),
+                    *GetNameSafe(TargetPawnController)))
+    {
+        return false;
+    }
 
     return QueryTeamAgent->GetGenericTeamId() != TargetTeamAgent->GetGenericTeamId();
 }
