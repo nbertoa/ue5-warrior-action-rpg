@@ -66,6 +66,9 @@ namespace WarriorRPGTags::Input::Toggleable
      * First press activates the lock; second press cancels it.
      */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(TargetLock);
+
+    /** Toggle input tag for the rage ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Rage);
 }
 
 namespace WarriorRPGTags::Input::Attack::Light
@@ -78,6 +81,15 @@ namespace WarriorRPGTags::Input::Attack::Heavy
 {
     /** Tag for the axe heavy attack input. Activates the heavy attack ability via GAS. */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(Axe);
+}
+
+namespace WarriorRPGTags::Input::SpecialWeaponAbility
+{
+    /** Input tag for the light special weapon ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Light);
+
+    /** Input tag for the heavy special weapon ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Heavy);
 }
 
 namespace WarriorRPGTags::Player::Ability
@@ -109,6 +121,12 @@ namespace WarriorRPGTags::Player::Ability
      * Distinct from Input::Toggleable::TargetLock (the button) and Player::Status::TargetLocking (the active state).
      */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(TargetLock);
+
+    /**
+     * Identity tag for the hero rage gameplay ability.
+     * Distinct from Input::Toggleable::Rage, which represents the input binding.
+     */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Rage);
 }
 
 namespace WarriorRPGTags::Player::Ability::Equip
@@ -148,6 +166,24 @@ namespace WarriorRPGTags::Player::Ability::Attack::Heavy
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(Axe);
 }
 
+namespace WarriorRPGTags::Player::Ability::SpecialWeaponAbility
+{
+    /** Identity tag for the light special weapon gameplay ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Light);
+
+    /** Identity tag for the heavy special weapon gameplay ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Heavy);
+}
+
+namespace WarriorRPGTags::Player::Cooldown::SpecialWeaponAbility
+{
+    /** Cooldown tag for the light special weapon ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Light);
+
+    /** Cooldown tag for the heavy special weapon ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Heavy);
+}
+
 namespace WarriorRPGTags::Player::Event
 {
     /**
@@ -162,6 +198,9 @@ namespace WarriorRPGTags::Player::Event
      * and suppress the incoming damage application.
      */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(SuccessfulBlock);
+
+    /** Gameplay Event sent to request activation of the hero rage ability. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(ActivateRage);
 }
 
 namespace WarriorRPGTags::Player::Event::Equip
@@ -242,6 +281,23 @@ namespace WarriorRPGTags::Player::Status
      * Added when target lock activates and removed when it ends or is cancelled.
      */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(TargetLocking);
+}
+
+namespace WarriorRPGTags::Player::Status::Rage
+{
+    /** Rage lifecycle statuses; Full and None are synchronized by the AttributeSet. */
+
+    /** Rage is entering its active state. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Activating);
+
+    /** Rage is currently active. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Active);
+
+    /** The rage resource has reached its maximum value. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Full);
+
+    /** The rage resource is empty. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(None);
 }
 
 namespace WarriorRPGTags::Player::Weapon
@@ -363,6 +419,9 @@ namespace WarriorRPGTags::Shared::Status
      * Added via UWarriorFunctionLibrary::AddGameplayTagToActor in PostGameplayEffectExecute.
      */
     UE_DECLARE_GAMEPLAY_TAG_EXTERN(Dead);
+
+    /** Status tag set while a character is immune to incoming damage. */
+    UE_DECLARE_GAMEPLAY_TAG_EXTERN(Invincible);
 }
 
 namespace WarriorRPGTags::Shared::Status::HitReact

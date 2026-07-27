@@ -87,32 +87,13 @@ void AWarriorProjectileBase::OnProjectileHit(UPrimitiveComponent* HitComponent,
         return;
     }
 
-    bool bIsValidBlock = false;
-
-    const bool bIsPlayerBlocking = UWarriorFunctionLibrary::NativeDoesActorHaveTag(HitPawn,
-                                                                                   WarriorRPGTags::Player::Status::Blocking);
-    if (bIsPlayerBlocking)
-    {
-        bIsValidBlock = UWarriorFunctionLibrary::IsValidBlock(this,
-                                                              HitPawn);
-    }
-
     FGameplayEventData Data;
     Data.Instigator = this;
     Data.Target = HitPawn;
 
-    if (bIsValidBlock)
-    {
-        UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(HitPawn,
-                                                                 WarriorRPGTags::Player::Event::SuccessfulBlock,
-                                                                 Data);
-    }
-    else
-    {
-        HandleApplyProjectileDamage(InstigatorPawn,
-                                    HitPawn,
-                                    Data);
-    }
+    HandleProjectilePawnImpact(InstigatorPawn,
+                               HitPawn,
+                               Data);
 
     Destroy();
 }
@@ -124,16 +105,71 @@ void AWarriorProjectileBase::OnProjectileBeginOverlap(UPrimitiveComponent* Overl
                                                       bool bFromSweep,
                                                       const FHitResult& SweepResult)
 {
-    if (ProjectileDamagePolicy == EProjectileDamagePolicy::OnBeginOverlap)
+    if (ProjectileDamagePolicy != EProjectileDamagePolicy::OnBeginOverlap)
     {
-        // Reuse the hit path so overlap and blocking projectiles share the
-        // same team, block, damage and destruction rules.
-        OnProjectileHit(OverlappedComponent,
-                        OtherActor,
-                        OtherComp,
-                        FVector::ZeroVector,
-                        SweepResult);
+        return;
     }
+
+    APawn* InstigatorPawn = GetInstigator();
+    if (!ensureMsgf(InstigatorPawn,
+                    TEXT("AWarriorProjectileBase::OnProjectileBeginOverlap — Projectile [%s] has no Instigator set. ") TEXT("Verify the spawner calls SetInstigator before activating the projectile."),
+                    *GetActorNameOrLabel()))
+    {
+        Destroy();
+        return;
+    }
+
+    APawn* HitPawn = Cast<APawn>(OtherActor);
+    if (!HitPawn || !UWarriorFunctionLibrary::IsTargetPawnHostile(InstigatorPawn,
+                                                                   HitPawn))
+    {
+        return;
+    }
+
+    // A projectile that remains active after an overlap can receive repeated
+    // overlap notifications for the same actor. Resolve each hostile pawn once.
+    if (OverlappedActors.Contains(HitPawn))
+    {
+        return;
+    }
+
+    OverlappedActors.AddUnique(HitPawn);
+
+    // Piercing projectiles do not generate a blocking hit, so spawn their
+    // impact feedback from the overlap callback before continuing onward.
+    BP_OnSpawnProjectileHitFX(SweepResult.ImpactPoint);
+
+    FGameplayEventData Data;
+    // Gameplay events consistently identify the projectile as the impact source;
+    // InstigatorPawn remains the GAS effect source used for damage attribution.
+    Data.Instigator = this;
+    Data.Target = HitPawn;
+
+    HandleProjectilePawnImpact(InstigatorPawn,
+                               HitPawn,
+                               Data);
+}
+
+void AWarriorProjectileBase::HandleProjectilePawnImpact(APawn* InInstigatorPawn,
+                                                        APawn* InHitPawn,
+                                                        const FGameplayEventData& InPayload)
+{
+    const bool bIsPlayerBlocking = UWarriorFunctionLibrary::NativeDoesActorHaveTag(InHitPawn,
+                                                                                    WarriorRPGTags::Player::Status::Blocking);
+    const bool bIsValidBlock = bIsPlayerBlocking && UWarriorFunctionLibrary::IsValidBlock(this,
+                                                                                           InHitPawn);
+
+    if (bIsValidBlock)
+    {
+        UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(InHitPawn,
+                                                                 WarriorRPGTags::Player::Event::SuccessfulBlock,
+                                                                 InPayload);
+        return;
+    }
+
+    HandleApplyProjectileDamage(InInstigatorPawn,
+                                InHitPawn,
+                                InPayload);
 }
 
 void AWarriorProjectileBase::HandleApplyProjectileDamage(APawn* InInstigatorPawn,

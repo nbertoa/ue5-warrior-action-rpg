@@ -185,4 +185,36 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
                                                            WarriorRPGTags::Shared::Status::Dead);
         }
     }
+
+    if (Data.EvaluatedData.Attribute == GetCurrentRageAttribute() || Data.EvaluatedData.Attribute == GetMaxRageAttribute())
+    {
+        // Full and None represent mutually exclusive resource-boundary states.
+        // Evaluate the empty state first: when MaxRage is zero, CurrentRage is also
+        // clamped to zero and must be represented as None rather than Full.
+        const bool bIsRageEmpty = FMath::IsNearlyZero(GetCurrentRage());
+        const bool bIsRageFull = !bIsRageEmpty && FMath::IsNearlyEqual(GetCurrentRage(),
+                                                                        GetMaxRage());
+
+        if (bIsRageFull)
+        {
+            UWarriorFunctionLibrary::AddGameplayTagToActor(AvatarActor,
+                                                           WarriorRPGTags::Player::Status::Rage::Full);
+            UWarriorFunctionLibrary::RemoveGameplayTagFromActor(AvatarActor,
+                                                                WarriorRPGTags::Player::Status::Rage::None);
+        }
+        else if (bIsRageEmpty)
+        {
+            UWarriorFunctionLibrary::RemoveGameplayTagFromActor(AvatarActor,
+                                                                WarriorRPGTags::Player::Status::Rage::Full);
+            UWarriorFunctionLibrary::AddGameplayTagToActor(AvatarActor,
+                                                           WarriorRPGTags::Player::Status::Rage::None);
+        }
+        else
+        {
+            UWarriorFunctionLibrary::RemoveGameplayTagFromActor(AvatarActor,
+                                                                WarriorRPGTags::Player::Status::Rage::Full);
+            UWarriorFunctionLibrary::RemoveGameplayTagFromActor(AvatarActor,
+                                                                WarriorRPGTags::Player::Status::Rage::None);
+        }
+    }
 }

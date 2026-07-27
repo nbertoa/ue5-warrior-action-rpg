@@ -13,7 +13,10 @@ struct FGameplayEventData;
 UENUM(BlueprintType)
 enum class EProjectileDamagePolicy : uint8
 {
+    /** Damage the first blocking pawn hit, then destroy the projectile. */
     OnHit,
+
+    /** Pierce hostile pawns, damaging each at most once, until the projectile hits world geometry or expires. */
     OnBeginOverlap
 };
 
@@ -74,6 +77,15 @@ protected:
 
 private:
     /**
+     * Resolves the shared pawn-impact rules for both collision policies.
+     * A valid block sends SuccessfulBlock; all other hostile impacts apply damage.
+     * The caller decides whether the projectile continues or is destroyed afterward.
+     */
+    void HandleProjectilePawnImpact(APawn* InInstigatorPawn,
+                                    APawn* InHitPawn,
+                                    const FGameplayEventData& InPayload);
+
+    /**
      * Applies the projectile's damage effect spec to the hit pawn and, on success,
      * sends the shared HitReact gameplay event so the target's hit react ability
      * (granted at startup, activated via WaitGameplayEvent) can trigger.
@@ -86,4 +98,7 @@ private:
     void HandleApplyProjectileDamage(APawn* InInstigatorPawn,
                                      APawn* InHitPawn,
                                      const FGameplayEventData& InPayload);
+
+    /** Actors already processed by this projectile's piercing overlap policy. */
+    TArray<AActor*> OverlappedActors;
 };

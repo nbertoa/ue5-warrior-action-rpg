@@ -56,6 +56,10 @@ namespace WarriorRPGTags::Input::Toggleable
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(TargetLock,
                                    "WarriorRPGTags.Input.Toggleable.TargetLock",
                                    "Toggle input tag for the target lock ability.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Rage,
+                                   "WarriorRPGTags.Input.Toggleable.Rage",
+                                   "Toggle input tag for the rage ability.");
 }
 
 namespace WarriorRPGTags::Input::Attack::Light
@@ -71,6 +75,17 @@ namespace WarriorRPGTags::Input::Attack::Heavy
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Axe,
                                    "WarriorRPGTags.Input.Attack.Heavy.Axe",
                                    "Tag for the axe heavy attack input.");
+}
+
+namespace WarriorRPGTags::Input::SpecialWeaponAbility
+{
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Light,
+                                   "WarriorRPGTags.Input.SpecialWeaponAbility.Light",
+                                   "Input tag for the light special weapon ability.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Heavy,
+                                   "WarriorRPGTags.Input.SpecialWeaponAbility.Heavy",
+                                   "Input tag for the heavy special weapon ability.");
 }
 
 namespace WarriorRPGTags::Player::Ability
@@ -90,6 +105,10 @@ namespace WarriorRPGTags::Player::Ability
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(TargetLock,
                                    "WarriorRPGTags.Player.Ability.TargetLock",
                                    "Identity tag for the hero target lock gameplay ability.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Rage,
+                                   "WarriorRPGTags.Player.Ability.Rage",
+                                   "Identity tag for the hero rage gameplay ability.");
 }
 
 namespace WarriorRPGTags::Player::Ability::Equip
@@ -121,6 +140,28 @@ namespace WarriorRPGTags::Player::Ability::Attack::Heavy
                                    "Identity tag for the axe heavy attack gameplay ability.");
 }
 
+namespace WarriorRPGTags::Player::Ability::SpecialWeaponAbility
+{
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Light,
+                                   "WarriorRPGTags.Player.Ability.SpecialWeaponAbility.Light",
+                                   "Identity tag for the light special weapon gameplay ability.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Heavy,
+                                   "WarriorRPGTags.Player.Ability.SpecialWeaponAbility.Heavy",
+                                   "Identity tag for the heavy special weapon gameplay ability.");
+}
+
+namespace WarriorRPGTags::Player::Cooldown::SpecialWeaponAbility
+{
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Light,
+                                   "WarriorRPGTags.Player.Cooldown.SpecialWeaponAbility.Light",
+                                   "Cooldown tag for the light special weapon ability.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Heavy,
+                                   "WarriorRPGTags.Player.Cooldown.SpecialWeaponAbility.Heavy",
+                                   "Cooldown tag for the heavy special weapon ability.");
+}
+
 namespace WarriorRPGTags::Player::Event
 {
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(HitPause,
@@ -130,6 +171,10 @@ namespace WarriorRPGTags::Player::Event
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(SuccessfulBlock,
                                    "WarriorRPGTags.Player.Event.SuccessfulBlock",
                                    "Gameplay Event sent to the defending hero when a block geometry check passes.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(ActivateRage,
+                                   "WarriorRPGTags.Player.Event.ActivateRage",
+                                   "Gameplay Event sent to request activation of the hero rage ability.");
 }
 
 namespace WarriorRPGTags::Player::Event::Equip
@@ -199,6 +244,25 @@ namespace WarriorRPGTags::Player::Status
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(TargetLocking,
                                    "WarriorRPGTags.Player.Status.TargetLocking",
                                    "Status tag active while the hero target lock ability is executing.");
+}
+
+namespace WarriorRPGTags::Player::Status::Rage
+{
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Activating,
+                                   "WarriorRPGTags.Player.Status.Rage.Activating",
+                                   "Status tag set while rage is entering its active state.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Active,
+                                   "WarriorRPGTags.Player.Status.Rage.Active",
+                                   "Status tag set while rage is active.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Full,
+                                   "WarriorRPGTags.Player.Status.Rage.Full",
+                                   "Status tag set when the rage resource reaches its maximum value.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(None,
+                                   "WarriorRPGTags.Player.Status.Rage.None",
+                                   "Status tag set when the rage resource is empty.");
 }
 
 namespace WarriorRPGTags::Player::Weapon
@@ -302,6 +366,10 @@ namespace WarriorRPGTags::Shared::Status
     UE_DEFINE_GAMEPLAY_TAG_COMMENT(Dead,
                                    "WarriorRPGTags.Shared.Status.Dead",
                                    "Loose status tag added when a character's CurrentHealth reaches zero.");
+
+    UE_DEFINE_GAMEPLAY_TAG_COMMENT(Invincible,
+                                   "WarriorRPGTags.Shared.Status.Invincible",
+                                   "Status tag set while a character is immune to incoming damage.");
 }
 
 namespace WarriorRPGTags::Shared::Status::HitReact

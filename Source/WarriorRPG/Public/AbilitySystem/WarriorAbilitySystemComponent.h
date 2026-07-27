@@ -41,8 +41,8 @@ public:
 
     /**
      * Called when a gameplay ability input button is released.
-     * Currently a stub — will be implemented when the first hold-to-charge or
-     * toggle ability is introduced.
+     * Cancels the active ability associated with the exact input tag when that
+     * input belongs to the Input::MustBeHeld hierarchy.
      *
      * @param InInputTag    The input tag identifying which ability was released.
      */

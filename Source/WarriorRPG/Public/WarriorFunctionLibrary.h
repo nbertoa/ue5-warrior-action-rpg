@@ -35,7 +35,8 @@ public:
      * Retrieves the UWarriorAbilitySystemComponent from any actor that implements
      * IAbilitySystemInterface. Used internally by all other functions in this library.
      *
-     * @param InActor   The actor to query. Must not be null and must have an ASC.
+     * @param InActor   The actor to query. May be null or lack an ASC; both cases
+     *                  log an ensure and return nullptr.
      * @return          The actor's ASC cast to UWarriorAbilitySystemComponent,
      *                  or nullptr if the actor has no ASC (logs an ensure and returns null).
      */

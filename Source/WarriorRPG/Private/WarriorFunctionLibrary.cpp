@@ -15,7 +15,13 @@
 
 UWarriorAbilitySystemComponent* UWarriorFunctionLibrary::NativeGetWarriorASCFromActor(AActor* InActor)
 {
-    check(InActor);
+    // This helper backs BlueprintCallable functions, so a null or destroyed actor
+    // is a recoverable caller error rather than a programming invariant.
+    if (!ensureMsgf(IsValid(InActor),
+                    TEXT("UWarriorFunctionLibrary::NativeGetWarriorASCFromActor received a null or invalid actor.")))
+    {
+        return nullptr;
+    }
 
     // GetAbilitySystemComponent returns null if the actor does not implement
     // IAbilitySystemInterface. Use NullAllowed so the cast does not crash on a null

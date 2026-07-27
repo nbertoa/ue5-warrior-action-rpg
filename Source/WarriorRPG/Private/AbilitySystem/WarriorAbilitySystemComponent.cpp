@@ -11,6 +11,8 @@ void UWarriorAbilitySystemComponent::OnGameplayAbilityInputPressed(const FGamepl
 {
     check(InInputTag.IsValid());
 
+    ABILITYLIST_SCOPE_LOCK();
+
     for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
     {
         // HasTagExact: exact match only — prevents hierarchy matches from triggering
@@ -20,19 +22,9 @@ void UWarriorAbilitySystemComponent::OnGameplayAbilityInputPressed(const FGamepl
             continue;
         }
 
-        if (InInputTag.MatchesTag(WarriorRPGTags::Input::Toggleable::Tag))
+        if (InInputTag.MatchesTag(WarriorRPGTags::Input::Toggleable::Tag) && AbilitySpec.IsActive())
         {
-            // Toggle behavior: a second press on an already-active toggleable ability
-            // cancels it rather than attempting a redundant activation.
-            // This allows a single button binding to act as both activate and deactivate.
-            if (AbilitySpec.IsActive())
-            {
-                CancelAbilityHandle(AbilitySpec.Handle);
-            }
-            else
-            {
-                TryActivateAbility(AbilitySpec.Handle);
-            }
+            CancelAbilityHandle(AbilitySpec.Handle);
         }
         else
         {
@@ -55,6 +47,8 @@ void UWarriorAbilitySystemComponent::OnGameplayAbilityInputReleased(const FGamep
     {
         return;
     }
+
+    ABILITYLIST_SCOPE_LOCK();
 
     for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
     {
@@ -131,7 +125,7 @@ bool UWarriorAbilitySystemComponent::TryActivateAbilityByTag(FGameplayTag Abilit
                Warning,
                TEXT("UWarriorAbilitySystemComponent::TryActivateAbilityByTag — " "No activatable ability found for tag [%s] on [%s]. " "Verify the ability has the tag set in its OwnedGameplayTags and is granted to this ASC."),
                *AbilityTagToActivate.ToString(),
-               *GetAvatarActor()->GetName());
+               *GetNameSafe(GetAvatarActor()));
 
         return false;
     }
