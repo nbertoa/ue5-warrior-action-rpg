@@ -1,7 +1,6 @@
 #include "GEExecCalc/GEExecCalc_DamageTaken.h"
 
 #include "AbilitySystem/WarriorAttributeSet.h"
-#include "Utils/WarriorRPGDebugHelper.h"
 #include "Utils/WarriorRPGTags.h"
 
 struct FWarriorDamageCapture
@@ -75,9 +74,6 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
     InExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetWarriorDamageCapture().AttackPowerDef,
                                                                  EvaluateParameters,
                                                                  SourceAttackPower);
-    //DebugHelper::Print(TEXT("SourceAttackPower"),
-    //                   SourceAttackPower);
-
     // Extract SetByCaller magnitudes injected by MakeHeroDamageEffectSpecHandle.
     // Iterating the map instead of calling GetSetByCallerMagnitude individually
     // avoids multiple map lookups and handles missing tags gracefully (value stays 0).
@@ -90,8 +86,6 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
         if (TagMagnitude.Key.MatchesTagExact(WarriorRPGTags::Shared::SetByCaller::BaseDamage))
         {
             BaseDamage = TagMagnitude.Value;
-            //DebugHelper::Print(TEXT("BaseDamage"),
-            //                   BaseDamage);
         }
 
         if (TagMagnitude.Key.MatchesTagExact(WarriorRPGTags::Player::SetByCaller::AttackType::Light))
@@ -100,16 +94,12 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
             // Combo counts are always whole numbers; the float representation is an artifact
             // of SetByCaller storing all magnitudes as floats.
             UsedLightAttackComboCount = static_cast<int32>(TagMagnitude.Value);
-            //DebugHelper::Print(TEXT("UsedLightAttackComboCount"),
-            //                   UsedLightAttackComboCount);
         }
 
         if (TagMagnitude.Key.MatchesTagExact(WarriorRPGTags::Player::SetByCaller::AttackType::Heavy))
         {
             // Same rationale as UsedLightAttackComboCount above.
             UsedHeavyAttackComboCount = static_cast<int32>(TagMagnitude.Value);
-            //DebugHelper::Print(TEXT("UsedHeavyAttackComboCount"),
-            //                   UsedHeavyAttackComboCount);
         }
     }
 
@@ -120,16 +110,11 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
                                                                  EvaluateParameters,
                                                                  TargetDefensePower);
 
-    //DebugHelper::Print(TEXT("TargetDefensePower"),
-    //                   TargetDefensePower);
-
     if (UsedLightAttackComboCount != 0)
     {
         const float DamageIncreasePercentLight = (UsedLightAttackComboCount - 1) * 0.05f + 1.0f;
 
         BaseDamage *= DamageIncreasePercentLight;
-        //DebugHelper::Print(TEXT("ScaledBaseDamageLight"),
-        //                   BaseDamage);
     }
 
     if (UsedHeavyAttackComboCount != 0)
@@ -137,17 +122,12 @@ void UGEExecCalc_DamageTaken::Execute_Implementation(const FGameplayEffectCustom
         const float DamageIncreasePercentHeavy = UsedHeavyAttackComboCount * 0.15f + 1.0f;
 
         BaseDamage *= DamageIncreasePercentHeavy;
-        //DebugHelper::Print(TEXT("ScaledBaseDamageHeavy"),
-        //                   BaseDamage);
     }
 
     // Defense is initialized to 1, but a malformed or incomplete initialization
     // effect can still leave it at zero. Clamp the divisor to avoid Inf/NaN damage.
     const float SafeTargetDefensePower = FMath::Max(TargetDefensePower, 1.0f);
     const float FinalDamageDone = BaseDamage * SourceAttackPower / SafeTargetDefensePower;
-    //DebugHelper::Print(TEXT("FinalDamageDone"),
-    //                   FinalDamageDone);
-
     if (FinalDamageDone > 0.0f)
     {
         OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(GetWarriorDamageCapture().DamageTakenProperty,

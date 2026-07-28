@@ -1,7 +1,7 @@
 // WarriorAttributeSet.cpp
 // Attribute initialization and post-execution callbacks for UWarriorAttributeSet.
 // PostGameplayEffectExecute handles clamping for persistent attributes,
-// broadcasts normalized values to UI component delegates, and
+// broadcasts normalized values to UI component delegates when available, and
 // consumes the DamageTaken intermediary attribute to apply damage to CurrentHealth.
 
 #include "AbilitySystem/WarriorAttributeSet.h"
@@ -64,22 +64,14 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
         CachedPawnUIInterface = TWeakInterfacePtr<IPawnUIInterface>(AvatarActor);
     }
 
-    // Hard invariant: every character that has an AttributeSet must implement
-    // IPawnUIInterface so UI delegates can be broadcast. A failure here means
-    // the character class was set up without the interface — a Blueprint error.
-    checkf(CachedPawnUIInterface.IsValid(),
-           TEXT("%s didn't implement IPawnUIInterface"),
-           *AvatarActor->GetActorNameOrLabel());
+    // UI is optional for base characters such as NPCs. Attribute clamping,
+    // damage consumption, and gameplay tags must continue to work without it.
+    // A missing interface or component suppresses UI notifications only.
+    UPawnUIComponent* PawnUIComponent = CachedPawnUIInterface.IsValid()
+        ? CachedPawnUIInterface->GetPawnUIComponent()
+        : nullptr;
 
-    UPawnUIComponent* PawnUIComponent = CachedPawnUIInterface->GetPawnUIComponent();
-
-    // Hard invariant: IPawnUIInterface::GetPawnUIComponent must return a valid component.
-    // A null here means the implementing character forgot to create the component
-    // in its constructor — always a setup error.
-    checkf(PawnUIComponent,
-           TEXT("Couldn't extract a PawnUIComponent from %s"),
-           *AvatarActor->GetActorNameOrLabel());
-
+    // Hero and enemy characters provide a component; NPCs may intentionally not.
     // MaxHealth and CurrentHealth are handled separately because an initialization GE
     // commonly modifies both attributes. Broadcasting unconditionally from both executions
     // would notify the UI twice while the enemy is being initialized.
@@ -106,9 +98,12 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
         {
             SetCurrentHealth(NewCurrentHealth);
 
-            // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
-            PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
-                                                                                          SafeMaxHealth));
+            if (PawnUIComponent)
+            {
+                // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
+                PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                              SafeMaxHealth));
+            }
         }
     }
     else if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
@@ -121,9 +116,12 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
 
         SetCurrentHealth(NewCurrentHealth);
 
-        // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
-        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
-                                                                                      GetMaxHealth()));
+        if (PawnUIComponent)
+        {
+            // Normalize to [0, 1] before broadcasting — widgets should never know raw values.
+            PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                          GetMaxHealth()));
+        }
     }
 
     // Clamp CurrentRage after any direct modification, same rationale as CurrentHealth above.
@@ -141,10 +139,13 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
 
         // Rage is hero-exclusive — only broadcast if the avatar has a HeroUIComponent.
         // Enemy characters return nullptr from GetHeroUIComponent() by design.
-        if (UHeroUIComponent* HeroUIComponent = CachedPawnUIInterface->GetHeroUIComponent())
+        if (CachedPawnUIInterface.IsValid())
         {
-            HeroUIComponent->OnCurrentRageChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentRage,
-                                                                                        SafeMaxRage));
+            if (UHeroUIComponent* HeroUIComponent = CachedPawnUIInterface->GetHeroUIComponent())
+            {
+                HeroUIComponent->OnCurrentRageChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentRage,
+                                                                                            SafeMaxRage));
+            }
         }
     }
 
@@ -165,17 +166,12 @@ void UWarriorAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffec
 
         SetCurrentHealth(NewCurrentHealth);
 
-        //const FString DebugString = FString::Printf(TEXT("Old Health: %f, Damage Done: %f, NewCurrentHealth: %f"),
-        //                                            OldHealth,
-        //                                            DamageDone,
-        //                                            NewCurrentHealth);
-
-        //DebugHelper::Print(DebugString,
-        //                   FColor::Green);
-
-        // Normalize to [0, 1] before broadcasting — same pattern as the direct health block above.
-        PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
-                                                                                      SafeMaxHealth));
+        if (PawnUIComponent)
+        {
+            // Normalize to [0, 1] before broadcasting — same pattern as the direct health block above.
+            PawnUIComponent->OnCurrentHealthChanged.Broadcast(GetNormalizedAttributeValue(NewCurrentHealth,
+                                                                                          SafeMaxHealth));
+        }
 
         // FMath::IsNearlyZero instead of == 0.0f: floating point arithmetic can produce
         // values like -0.000001f after clamping, which would cause == 0.0f to never fire.

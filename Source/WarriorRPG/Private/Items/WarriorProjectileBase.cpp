@@ -56,9 +56,16 @@ void AWarriorProjectileBase::OnProjectileHit(UPrimitiveComponent* HitComponent,
                                              FVector NormalImpulse,
                                              const FHitResult& Hit)
 {
-    check(OtherActor);
-
     BP_OnSpawnProjectileHitFX(Hit.ImpactPoint);
+
+    // World geometry can report a hit without an owning actor. That is a normal
+    // collision outcome, not an invariant violation: play the impact effect and
+    // stop the projectile without attempting pawn-specific damage handling.
+    if (!IsValid(OtherActor))
+    {
+        Destroy();
+        return;
+    }
 
     // The instigator is validated once, here, and threaded through to every
     // downstream call (IsTargetPawnHostile, HandleApplyProjectileDamage) instead

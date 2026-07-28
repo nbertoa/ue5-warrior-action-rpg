@@ -105,6 +105,7 @@ void AWarriorEnemyCharacter::PossessedBy(AController* NewController)
     InitEnemyStartupData();
 }
 
+#if WITH_EDITOR
 void AWarriorEnemyCharacter::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -128,6 +129,7 @@ void AWarriorEnemyCharacter::PostEditChangeProperty(struct FPropertyChangedEvent
                                                  RightHandCollisionBoxAttachBoneName);
     }
 }
+#endif
 
 void AWarriorEnemyCharacter::OnBodyCollisionBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent,
                                                             AActor* OtherActor,

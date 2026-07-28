@@ -56,7 +56,7 @@ public:
      *
      * Handles three responsibilities:
      * 1. Clamping — keeps CurrentHealth and CurrentRage within [0, Max] after any direct modification.
-     * 2. UI notification — broadcasts normalized attribute values to the UI component delegates.
+     * 2. UI notification — broadcasts normalized attribute values when the avatar provides a UI component.
      * 3. Damage consumption — reads DamageTaken (written by UGEExecCalc_DamageTaken),
      *    applies it to CurrentHealth, then resets DamageTaken to zero.
      *
@@ -115,7 +115,7 @@ private:
                         DamageTaken)
 
     /**
-     * Cached weak reference to the avatar actor's IPawnUIInterface.
+     * Cached weak reference to the avatar actor's optional IPawnUIInterface.
      * Populated on first access in PostGameplayEffectExecute and reused on subsequent calls
      * to avoid repeated interface casts per GE execution.
      * TWeakInterfacePtr automatically invalidates if the actor is destroyed.

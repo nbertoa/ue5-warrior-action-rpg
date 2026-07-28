@@ -58,6 +58,13 @@ UWarriorActivatableWidget* UWarriorUISubsystem::PushWidgetToStack(APlayerControl
                                                                   FGameplayTag InWidgetStackTag,
                                                                   TSubclassOf<UWarriorActivatableWidget> InWidgetClass)
 {
+    checkf(InPlayerController,
+           TEXT("UWarriorUISubsystem::PushWidgetToStack — InPlayerController is null. " "Widgets pushed to a player stack require an owning controller."));
+    checkf(InWidgetStackTag.IsValid(),
+           TEXT("UWarriorUISubsystem::PushWidgetToStack — InWidgetStackTag is invalid. " "Pass a registered WarriorRPGTags.UI.WidgetStack tag."));
+    checkf(InWidgetClass,
+           TEXT("UWarriorUISubsystem::PushWidgetToStack — InWidgetClass is null. " "Pass a valid non-abstract activatable widget class."));
+
     // Hard invariant: RegisterPrimaryLayoutWidget must be called at game startup
     // before any widget push requests. A null layout means that call was skipped.
     checkf(PrimaryLayoutWidget,
@@ -66,6 +73,9 @@ UWarriorActivatableWidget* UWarriorUISubsystem::PushWidgetToStack(APlayerControl
     // Locate the correct stack layer by tag — crashes if the tag is not registered,
     // which means the Blueprint forgot to call RegisterWidgetStack for this layer.
     UCommonActivatableWidgetContainerBase* TargetStack = PrimaryLayoutWidget->FindWidgetStackByTag(InWidgetStackTag);
+    checkf(TargetStack,
+           TEXT("UWarriorUISubsystem::PushWidgetToStack — Registered stack [%s] is null. " "Verify the layout's stack registration."),
+           *InWidgetStackTag.ToString());
 
     // AddWidget instantiates the widget and pushes it onto the stack.
     // The lambda runs before the widget is activated, guaranteeing the player
