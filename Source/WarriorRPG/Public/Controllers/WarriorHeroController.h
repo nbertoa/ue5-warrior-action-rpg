@@ -1,8 +1,5 @@
 // WarriorHeroController.h
-// Player controller for the hero character.
-// Responsible for creating and registering the root UI layout widget
-// when the hero pawn is possessed, ensuring the UI is available before
-// any OnGiven abilities attempt to push widgets to the stack.
+// Player controller responsible for the hero's local UI root and team identity.
 
 #pragma once
 
@@ -14,24 +11,11 @@
 class UWarriorPrimaryLayout;
 
 /**
- * AWarriorHeroController
+ * Player controller for the hero character.
  *
- * Player controller for the WarriorRPG hero.
- * Creates the root UI layout widget (UWarriorPrimaryLayout) in OnPossess
- * and registers it with UWarriorUISubsystem so all subsequent widget push
- * requests can be routed to the correct stack layer.
- *
- * Implements IGenericTeamAgentInterface with team ID 0 (hero faction) so
- * AWarriorAIController::GetTeamAttitudeTowards correctly identifies the
- * hero as a hostile target for enemy AI.
- *
- * OnPossess is used instead of BeginPlay because PossessedBy on the character
- * fires before BeginPlay on the controller — abilities with the OnGiven policy
- * activate immediately during PossessedBy and may attempt to push widgets before
- * BeginPlay would have had a chance to register the layout.
- *
- * PrimaryLayoutWidgetClass must be assigned in the Blueprint defaults —
- * the controller will warn and skip UI creation if it is not set.
+ * Owns a single root UI layout for the local player and registers it with
+ * UWarriorUISubsystem. The layout is created before local startup abilities
+ * are granted and is reused across pawn re-possessions.
  */
 UCLASS()
 class WARRIORRPG_API AWarriorHeroController : public APlayerController, public IGenericTeamAgentInterface
@@ -39,45 +23,37 @@ class WARRIORRPG_API AWarriorHeroController : public APlayerController, public I
     GENERATED_BODY()
 
 public:
-    /**
-     * Initializes the hero team ID to 0 (hero faction).
-     * Enemy AI controllers use team ID 1 — the attitude system uses this
-     * difference to mark the hero as a hostile target for enemy perception.
-     */
+    /** Initializes the hero team ID to 0. */
     AWarriorHeroController();
 
     //~ Begin IGenericTeamAgentInterface Interface
-    /** Returns the hero's team ID (0) for AI attitude queries. */
+    /** Returns the hero's team ID. */
     virtual FGenericTeamId GetGenericTeamId() const override;
     //~ End IGenericTeamAgentInterface Interface
 
+    /** Creates and registers the local player's root layout when needed. */
+    void EnsurePrimaryLayoutWidget();
+
 protected:
     //~ Begin APlayerController Interface
-    /**
-     * Called after the controller possesses a pawn and PossessedBy has completed.
-     * Creates and registers the root UI layout widget so it is available
-     * before any OnGiven abilities activate and attempt to push widgets.
-     *
-     * @param InPawn    The pawn that was just possessed.
-     */
-    virtual void OnPossess(APawn* InPawn) override;
+    /** Initializes the local UI when this controller enters the playing state. */
+    virtual void BeginPlayingState() override;
+
+    /** Removes the registered root layout before this controller is destroyed. */
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     //~ End APlayerController Interface
 
-    /**
-     * The hero's team ID used by IGenericTeamAgentInterface.
-     * Set to 0 in the constructor — enemy controllers use 1, making
-     * attitude comparisons straightforward: lower ID = hero = hostile to enemies.
-     */
+    /** Team identifier used by AI attitude queries. */
     FGenericTeamId HeroTeamID;
 
 private:
-    /**
-     * The Blueprint subclass of UWarriorPrimaryLayout to instantiate when possessing a pawn.
-     * Assign this in the Blueprint defaults of BP_WarriorHeroController.
-     * If not set, the UI system will not initialize and a warning will be logged.
-     */
+    /** Blueprint layout class assigned in the controller defaults. */
     UPROPERTY(EditDefaultsOnly,
         Category = "UI",
         meta = (AllowPrivateAccess = "true"))
     TSubclassOf<UWarriorPrimaryLayout> PrimaryLayoutWidgetClass;
+
+    /** Root layout retained for the controller's play session. */
+    UPROPERTY(Transient)
+    TObjectPtr<UWarriorPrimaryLayout> PrimaryLayoutWidget;
 };

@@ -64,6 +64,9 @@ public:
         Category = "Warrior|UI")
     void RegisterPrimaryLayoutWidget(UWarriorPrimaryLayout* InWidget);
 
+    /** Clears the root layout only when InWidget is the currently registered layout. */
+    void UnregisterPrimaryLayoutWidget(UWarriorPrimaryLayout* InWidget);
+
     /**
      * Instantiates InWidgetClass and pushes it onto the stack layer identified by
      * InWidgetStackTag in the registered primary layout widget.

@@ -54,6 +54,14 @@ void UWarriorUISubsystem::RegisterPrimaryLayoutWidget(UWarriorPrimaryLayout* InW
            *InWidget->GetName());
 }
 
+void UWarriorUISubsystem::UnregisterPrimaryLayoutWidget(UWarriorPrimaryLayout* InWidget)
+{
+    if (PrimaryLayoutWidget == InWidget)
+    {
+        PrimaryLayoutWidget = nullptr;
+    }
+}
+
 UWarriorActivatableWidget* UWarriorUISubsystem::PushWidgetToStack(APlayerController* InPlayerController,
                                                                   FGameplayTag InWidgetStackTag,
                                                                   TSubclassOf<UWarriorActivatableWidget> InWidgetClass)

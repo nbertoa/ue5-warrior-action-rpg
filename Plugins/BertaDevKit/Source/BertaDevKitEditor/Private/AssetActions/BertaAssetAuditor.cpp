@@ -4,6 +4,7 @@
 #include "Log/BertaDevKitEditorLog.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
 #include "EditorUtilityLibrary.h"
 #include "Engine/Blueprint.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -198,6 +199,7 @@ void UBertaAssetAuditor::FixAssetNaming()
 
 	int32 RenamedCount = 0;
 	int32 SkippedCount = 0;
+	FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 
 	for (const FAssetData& AssetData : Assets)
 	{
@@ -276,8 +278,21 @@ void UBertaAssetAuditor::FixAssetNaming()
 		}
 
 		const FString NewName = *FoundPrefix + CleanName;
-		UEditorUtilityLibrary::RenameAsset(LoadedAsset,
-		                                   NewName);
+		TArray<FAssetRenameData> AssetsToRename;
+		AssetsToRename.Emplace(LoadedAsset,
+		                       AssetData.PackagePath.ToString(),
+		                       NewName);
+
+		if (!AssetToolsModule.Get().RenameAssets(AssetsToRename))
+		{
+			UE_LOG(LogBertaDevKitEditor,
+			       Warning,
+			       TEXT("[UBertaAssetAuditor::FixAssetNaming] Failed to rename: %s -> %s"),
+			       *AssetData.AssetName.ToString(),
+			       *NewName);
+			++SkippedCount;
+			continue;
+		}
 
 		UE_LOG(LogBertaDevKitEditor,
 		       Log,

@@ -11,6 +11,7 @@
 #include "Components/Combat/HeroCombatComponent.h"
 #include "Components/Input/WarriorRPGInputComponent.h"
 #include "Components/UI/HeroUIComponent.h"
+#include "Controllers/WarriorHeroController.h"
 #include "DataAssets/Input/DataAsset_InputConfig.h"
 #include "DataAssets/StartupData/DataAsset_HeroStartupData.h"
 #include "EnhancedInputSubsystems.h"
@@ -180,6 +181,11 @@ void AWarriorHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 void AWarriorHeroCharacter::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
+
+    if (AWarriorHeroController* HeroController = Cast<AWarriorHeroController>(NewController))
+    {
+        HeroController->EnsurePrimaryLayoutWidget();
+    }
 
     if (bStartupDataApplied)
     {

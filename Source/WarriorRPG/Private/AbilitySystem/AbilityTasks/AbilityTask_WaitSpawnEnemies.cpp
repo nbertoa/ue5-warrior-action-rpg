@@ -6,6 +6,7 @@
 #include "Characters/WarriorEnemyCharacter.h"
 #include "Engine/AssetManager.h"
 #include "NavigationSystem.h"
+#include "Utils/WarriorRPGLogCategories.h"
 
 UAbilityTask_WaitSpawnEnemies* UAbilityTask_WaitSpawnEnemies::WaitSpawnEnemies(UGameplayAbility* OwningAbility,
                                                                                FGameplayTag EventTag,
@@ -180,7 +181,7 @@ void UAbilityTask_WaitSpawnEnemies::OnEnemyClassLoaded()
 
         if (!bFoundReachableLocation)
         {
-            UE_LOG(LogTemp,
+            UE_LOG(LogWarriorRPG,
                    Warning,
                    TEXT("[UAbilityTask_WaitSpawnEnemies] No reachable NavMesh location found at index %d."),
                    i);
