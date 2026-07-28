@@ -152,6 +152,10 @@ Never invent Unreal APIs.
 
 Match verification effort to risk.
 
+Do not compile, build, cook, package, or run equivalent build-pipeline actions for this project. The user performs those actions and may provide their results for diagnosis or follow-up work.
+
+Non-compilation verification, such as static inspection and source-level analysis, remains allowed. Always state which verification was performed and which compilation or build checks remain pending under this constraint.
+
 Never claim tests that were not executed.
 
 Always report:
